@@ -1,2 +1,2 @@
 # exercism
-Coding challenges from https://exercism.io
+Coding challenges on the go stream from https://exercism.io
