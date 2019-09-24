@@ -13,7 +13,7 @@ func Distance(a, b string) (int, error) {
 		return 0, errors.New("Two strings have different length")
 	}
 	var distance int
-	for i := 0; i < len(a); i++ {
+	for i := range a {
 		if a[i] != b[i] {
 			distance++
 		}
