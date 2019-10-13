@@ -1,23 +1,23 @@
 package raindrops
 
 import (
-	"bytes"
 	"strconv"
 )
 
+// Convert takes an int and outputs the sound as a string
 func Convert(n int) string {
-	var b bytes.Buffer
+	var output string
 	if n%3 == 0 {
-		b.WriteString("Pling")
+		output += "Pling"
 	}
 	if n%5 == 0 {
-		b.WriteString("Plang")
+		output += "Plang"
 	}
 	if n%7 == 0 {
-		b.WriteString("Plong")
+		output += "Plong"
 	}
-	if b.String() == "" {
+	if output == "" {
 		return strconv.Itoa(n)
 	}
-	return b.String()
+	return output
 }
