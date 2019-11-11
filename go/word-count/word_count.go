@@ -1,7 +1,6 @@
 package wordcount
 
 import (
-	"fmt"
 	"log"
 	"regexp"
 	"strings"
@@ -18,7 +17,6 @@ func WordCount(phrase string) Frequency {
 			output[word] = 1
 		} else {
 			output[word] += 1
-			fmt.Println("Found it", output)
 		}
 	}
 	return output
@@ -32,9 +30,7 @@ func FormatSlice(input []string) []string {
 	}
 	output := make([]string, len(input))
 	for i, word := range input {
-		output[i] = reg.ReplaceAllString(word, "")
-		output[i] = strings.TrimLeft(output[i], "'")
-		output[i] = strings.TrimRight(output[i], "'")
+		output[i] = reg.ReplaceAllString(strings.Trim(word, "'"), "")
 	}
 	return output
 }
