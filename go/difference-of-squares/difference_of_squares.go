@@ -3,20 +3,13 @@ package diffsquares
 
 // SquareOfSum returns the square of the sum of the first N natural numbers.
 func SquareOfSum(n int) int {
-	var sum int
-	for i := n; i > 0; i-- {
-		sum += i
-	}
+	sum := n * (n + 1) / 2
 	return sum * sum
 }
 
 // SquareOfSum returns the sum of the first N natural numbers squared.
 func SumOfSquares(n int) int {
-	var sum int
-	for i := n; i > 0; i-- {
-		sum += i * i
-	}
-	return sum
+	return n * (n + 1) * (2*n + 1) / 6
 }
 
 // Difference returns the difference of a and b
