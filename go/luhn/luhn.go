@@ -13,18 +13,18 @@ import (
 func Valid(input string) bool {
 	// take out empty spaces from input first
 	space := regexp.MustCompile(`\s`)
-	s := space.ReplaceAllString(input, "")
-	s = strings.TrimSpace(s)
+	s := strings.TrimSpace(space.ReplaceAllString(input, ""))
 
 	// check for non-number characters and return false if found
 	if len(s) <= 1 {
 		return false
 	}
-	if _, err := strconv.Atoi(s); err == nil {
-		result := SumOfString(DoubleSecondDigit(s))
-		if result%10 == 0 {
-			return true
-		}
+	if _, err := strconv.Atoi(s); err != nil {
+		return false
+	}
+	result := SumOfString(DoubleSecondDigit(s))
+	if result%10 == 0 {
+		return true
 	}
 	return false
 }
@@ -39,6 +39,7 @@ func DoubleSecondDigit(input string) string {
 			fmt.Println(err)
 		}
 		result += strconv.Itoa(firstDigit)
+
 		secondDigit, err := strconv.Atoi(string(input[i-1]))
 		if err != nil {
 			fmt.Println(err)
