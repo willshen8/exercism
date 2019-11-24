@@ -18,7 +18,7 @@ func Nth(n int) (int, bool) {
 func NextPrime(curPrime int) int {
 	var nextPrime int
 	for i := curPrime + 1; nextPrime == 0; i++ {
-		if IsPrime(i) == true {
+		if IsPrime(i) {
 			nextPrime = i
 		}
 	}
