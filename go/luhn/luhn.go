@@ -1,4 +1,4 @@
-// package luhn uses luhn algorithm is a checksum using modulus 10
+// Package luhn uses luhn algorithm is a checksum using modulus 10
 package luhn
 
 import (
@@ -8,13 +8,13 @@ import (
 	"strings"
 )
 
+var space = regexp.MustCompile(`\s`)
+
 // Valid takes a string and determines if the input is valid based on
 // Luhn's algorithm
 func Valid(input string) bool {
 	// take out empty spaces from input first
-	space := regexp.MustCompile(`\s`)
 	s := strings.TrimSpace(space.ReplaceAllString(input, ""))
-
 	// check for non-number characters and return false if found
 	if len(s) <= 1 {
 		return false
@@ -23,10 +23,7 @@ func Valid(input string) bool {
 		return false
 	}
 	result := SumOfString(DoubleSecondDigit(s))
-	if result%10 == 0 {
-		return true
-	}
-	return false
+	return result%10 == 0
 }
 
 // DoubleSecondDigit doubles every second digit from right and if result is more than 9
