@@ -14,8 +14,8 @@ func Square(n int) (uint64, error) {
 	return uint64(result << uint64(n-1)), nil
 }
 
-// Square calculates the number of grains based on the square and output
-// The result should be all 1s for a 64 bit digit
+// Total calculates the number of grains based on the square and output
+// The result should be a 64 bit digit of all 1s
 func Total() uint64 {
 	var result uint64 = 1
 	for i := 1; i < 65; i++ {
