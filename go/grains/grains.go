@@ -18,5 +18,5 @@ func Square(n int) (uint64, error) {
 // The result should be a 64 bit digit of all 1s
 func Total() uint64 {
 	var result uint64
-	return ^(result << uint64(64))
+	return ^(result << uint64(63))
 }
