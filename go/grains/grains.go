@@ -11,12 +11,11 @@ func Square(n int) (uint64, error) {
 	if n < 1 || n > 64 {
 		return 0, errors.New("the Square on the cheese board must be greater than 0 and less than 65")
 	}
-	return result << uint64(n-1), nil
+	return result << (n - 1), nil
 }
 
 // Total calculatesthe number of grains based on the square and output
 // The result should be a 64 bit digit of all 1s
 func Total() uint64 {
-	var result uint64
-	return ^(result << uint64(63))
+	return 1<<64 - 1
 }
