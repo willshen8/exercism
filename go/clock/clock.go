@@ -63,7 +63,7 @@ func (c Clock) Subtract(minutes int) Clock {
 }
 
 // FormatClock format a clock into the correct format
-func (c Clock) FormatClock() Clock{
+func (c Clock) FormatClock() Clock {
 	if c.hour < 0 {
 		c.hour = 24 - (-c.hour)%24
 	}
@@ -74,7 +74,7 @@ func (c Clock) FormatClock() Clock{
 		c.minute = 60 - (-c.minute)%60
 	}
 	if c.minute >= 60 {
-		c.minute= c.minute% 60
+		c.minute = c.minute % 60
 	}
 	return c
 }
