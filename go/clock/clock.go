@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// Clock represent a real clock with minute and hour
 type Clock struct {
 	hour   int
 	minute int
@@ -13,6 +14,7 @@ func (c Clock) String() string {
 	return fmt.Sprintf("%02d:%02d", c.hour, c.minute)
 }
 
+// New function create a clock with the minute and hour passed in
 func New(h, m int) Clock {
 	if m < 0 {
 		h = h - 1 - (-m)/60
