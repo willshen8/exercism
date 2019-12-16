@@ -27,19 +27,6 @@ func (c Clock) Add(minutes int) Clock {
 
 // Subtract take away x minutes from a clock
 func (c Clock) Subtract(minutes int) Clock {
-	// var hoursToSubtract, minutesToSubtract int
-	// if minutes >= 60 {
-	// 	hoursToSubtract = minutes / 60
-	// 	minutesToSubtract = minutes - 60*hoursToSubtract
-	// 	c.hour -= hoursToSubtract
-	// }
-
-	// if minutesToSubtract > c.minute || (minutes > c.minute && minutes%60 != 0 && hoursToSubtract == 0) {
-	// 	c.hour--
-	// 	c.minute = 60 - minutes + c.minute
-	// } else {
-	// 	c.minute -= minutes
-	// }
 	c.minute-= minutes
 	return c.FormatClock()
 }
