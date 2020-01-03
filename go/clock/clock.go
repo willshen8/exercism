@@ -18,7 +18,13 @@ func (c Clock) String() string {
 
 // New function create a clock with the minute and hour passed in
 func New(h, m int) Clock {
-	return Clock{minute: NormaliseClock(m + h*60)}
+	m = m+ h*60
+	if m < 0 {
+		m = m % MINUTESINADAY
+		m = MINUTESINADAY + m
+	}
+	m = m % MINUTESINADAY
+	return Clock{minute: m}
 }
 
 // Add will add a certain minutes to a clock
@@ -29,13 +35,4 @@ func (c Clock) Add(minutes int) Clock {
 // Subtract takes away x minutes from a clock
 func (c Clock) Subtract(minutes int) Clock {
 	return New(0, c.minute-minutes)
-}
-
-// NormaliseClock normalise a clock in the right format
-func NormaliseClock(m int) int {
-	if m < 0 {
-		m = m % MINUTESINADAY
-		m = MINUTESINADAY + m
-	}
-	return m % MINUTESINADAY
 }
