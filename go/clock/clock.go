@@ -4,9 +4,6 @@ import (
 	"fmt"
 )
 
-// MINUTESINADAY gives the number of minutes in one day
-const MinutesInOneDay = 1440
-
 // Clock represent a real clock with minute and hour
 type Clock struct {
 	minute int
@@ -18,12 +15,12 @@ func (c Clock) String() string {
 
 // New function create a clock with the minute and hour passed in
 func New(h, m int) Clock {
-	m = m+ h*60
+	m = m + h*60
 	if m < 0 {
-		m %=  MinutesInOneDay
-		m += MinutesInOneDay
+		m %= 24 * 60
+		m += 24 * 60
 	}
-	m %= MinutesInOneDay
+	m %= 24 * 60
 	return Clock{minute: m}
 }
 
