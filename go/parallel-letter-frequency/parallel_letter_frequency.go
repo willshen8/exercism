@@ -17,7 +17,7 @@ func Frequency(s string) FreqMap {
 // and return as a FreqMap.
 func ConcurrentFrequency(slice []string) FreqMap {
 	// create a buffered channel with capacity equal to the slice length
-	c := make(chan FreqMap, len(slice))
+	c := make(chan FreqMap, 10)
 	for _, r := range slice {
 		r := r
 		go func() {
