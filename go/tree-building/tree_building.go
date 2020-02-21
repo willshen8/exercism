@@ -79,12 +79,12 @@ func Build(records []Record) (*Node, error) {
 	}
 	sort.Ints(parentIDs)
 
-	for _, parentId := range parentIDs {
-		parentNode := FindNodeByID(root, parentId)
+	for _, parentID := range parentIDs {
+		parentNode := FindNodeByID(root, parentID)
 		if parentNode != nil {
 			var childIds []int
 			for _, value := range records {
-				if value.Parent == parentId && value.ID != 0 {
+				if value.Parent == parentID && value.ID != 0 {
 					childIds = append(childIds, value.ID)
 
 				}
