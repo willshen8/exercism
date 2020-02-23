@@ -2,4 +2,4 @@ module github.com/willshen8/exercism
 
 go 1.13
 
-require honnef.co/go/tools v0.0.1-2019.2.3 // indirect
+require golang.org/x/tools/gopls v0.3.2 // indirect
