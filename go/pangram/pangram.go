@@ -16,5 +16,5 @@ func IsPangram(input string) bool {
 		}
 	}
 
-	return len(lettersMap) != 26
+	return len(lettersMap) == 26
 }
