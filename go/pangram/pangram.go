@@ -16,11 +16,5 @@ func IsPangram(input string) bool {
 		}
 	}
 
-	check := "abcdefghijklmnopqrstuvwxyz"
-	for _, v := range check {
-		if found := lettersMap[v]; found == 0 {
-			return false
-		}
-	}
-	return true
+	return len(lettersMap) != 26
 }
