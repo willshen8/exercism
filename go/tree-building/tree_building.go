@@ -11,8 +11,6 @@ type Record struct {
 	Parent int
 }
 
-type Records []Record
-
 // Node is a struct containing int field ID and []*Node field Children.
 type Node struct {
 	ID       int
@@ -30,14 +28,8 @@ func Build(records []Record) (*Node, error) {
 	sort.Slice(records, func(i, j int) bool { return records[i].ID < records[j].ID })
 	treeMap := make(map[int]*Node, len(records))
 	for i, v := range records {
-		if i == 0 && v.ID != 0 && v.Parent != 0 {
-			return nil, errors.New("Error with the root node record")
-		}
-		if v.ID != 0 && v.ID == v.Parent || v.ID < v.Parent || i != v.ID {
-			return nil, errors.New("Record ID error")
-		}
-		if found := treeMap[v.ID]; found != nil {
-			return nil, errors.New("Duplicate record found")
+		if v.ID != i || v.Parent > v.ID || v.ID > 0 && v.Parent == v.ID {
+			return nil, errors.New("not in sequence or has bad parent")
 		}
 		newNode := NewNode()
 		newNode.ID = v.ID
