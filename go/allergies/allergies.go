@@ -5,11 +5,6 @@ import (
 	"math/bits"
 )
 
-type allergicResult struct {
-	substance string
-	result    bool
-}
-
 var allergies = map[uint]string{
 	1:   "eggs",
 	2:   "peanuts",
