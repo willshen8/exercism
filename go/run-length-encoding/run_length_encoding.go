@@ -8,42 +8,36 @@ import (
 
 // RunLengthEncode takes an input and encoded it as RLE
 func RunLengthEncode(input string) string {
-	if input == "" {
-		return ""
-	}
-	if len(input) == 1 {
+	if len(input) <= 1 {
 		return input
 	}
 
-	var curr, prev int
+	var curr int
 	var counter = 1
 	var strBuilder strings.Builder
 
 	for curr < len(input) {
 		if curr == 0 {
 			curr++
-			continue
 		}
 		//check for the end of the string
 		if curr == len(input)-1 {
-			if input[curr] != input[prev] {
+			if input[curr] != input[curr-1] {
 				if counter == 1 {
-					strBuilder.WriteString(string(input[prev]))
+					strBuilder.WriteString(string(input[curr-1]))
 					strBuilder.WriteString(string(input[curr]))
 					curr++
-					prev++
 					counter = 1
 					continue
 				} else if counter > 1 {
 					strBuilder.WriteString(strconv.Itoa(counter))
-					strBuilder.WriteString(string(input[prev]))
+					strBuilder.WriteString(string(input[curr-1]))
 					strBuilder.WriteString(string(input[curr]))
 					curr++
-					prev++
 					counter = 1
 					continue
 				}
-			} else if input[curr] == input[prev] {
+			} else if input[curr] == input[curr-1] {
 				counter++
 				strBuilder.WriteString(strconv.Itoa(counter))
 				strBuilder.WriteString(string(input[curr]))
@@ -51,35 +45,59 @@ func RunLengthEncode(input string) string {
 				continue
 			}
 		}
-
-		if input[curr] != input[prev] {
+		// when current char is not equal to previous one
+		if input[curr] != input[curr-1] {
 			if counter == 1 {
-				strBuilder.WriteString(string(input[prev]))
+				strBuilder.WriteString(string(input[curr-1]))
 				curr++
-				prev++
 				counter = 1
 				continue
 			} else if counter > 1 {
 				strBuilder.WriteString(strconv.Itoa(counter))
-				strBuilder.WriteString(string(input[prev]))
+				strBuilder.WriteString(string(input[curr-1]))
 				curr++
-				prev++
 				counter = 1
 				continue
 			}
 		}
-
-		if input[curr] == input[prev] {
+		// when current char equals to previous one
+		if input[curr] == input[curr-1] {
 			counter++
 			curr++
-			prev++
 		}
-
 	}
 	return strBuilder.String()
 }
 
 // RunLengthDecode takes an input and decoded it as RLE
 func RunLengthDecode(input string) string {
-	return ""
+	if len(input) <= 1 {
+		return input
+	}
+
+	var curr int
+	var output, repeatFactor string
+
+	for curr < len(input) {
+		_, err := strconv.Atoi(string(input[curr]))
+		if err == nil {
+			repeatFactor += string(input[curr])
+			curr++
+			continue
+		} else { // else we have read a character
+			result, _ := strconv.Atoi(repeatFactor)
+			if result == 0 {
+				output += string(input[curr])
+			} else {
+				for i := 0; i < result; i++ {
+					output += string(input[curr])
+				}
+			}
+			curr++
+			repeatFactor = ""
+		}
+
+	}
+
+	return output
 }
