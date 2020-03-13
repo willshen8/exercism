@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// Robot has a unique name as defined by the pattern #AA111
 type Robot struct {
 	name string
 }
@@ -18,11 +19,11 @@ func (r *Robot) Name() (string, error) {
 	if r.name == "" {
 		if len(robots) == 0 { // exhausted all names and therefore start all over again
 			return "", errors.New("All names have been exhausted")
-		} else {
-			randomNumIndex := randomInt(0, len(robots))
-			r.name = robots[randomNumIndex]
-			robots = RemoveIndex(robots, randomNumIndex)
 		}
+		randomNumIndex := randomInt(0, len(robots))
+		r.name = robots[randomNumIndex]
+		robots = RemoveIndex(robots, randomNumIndex)
+
 	}
 	return r.name, nil
 }
@@ -57,6 +58,7 @@ func randomInt(min, max int) int {
 	return min + rand.Intn(max-min)
 }
 
+// RemoveIndex removes the element at index position specified and return a new slice
 func RemoveIndex(s []string, index int) []string {
 	return append(s[:index], s[index+1:]...)
 }
