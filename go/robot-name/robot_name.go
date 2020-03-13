@@ -29,9 +29,8 @@ func (r *Robot) Name() (string, error) {
 }
 
 // Reset resets a robot's name
-func (r *Robot) Reset() string {
+func (r *Robot) Reset() {
 	r.name = ""
-	return r.name
 }
 
 // InitialiseRobotNames generates a slice with all possible robot combinations
