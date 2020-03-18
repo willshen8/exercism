@@ -2,8 +2,8 @@ package robotname
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
-	"strconv"
 	"time"
 )
 
@@ -12,18 +12,20 @@ type Robot struct {
 	name string
 }
 
-var robots = InitialiseRobotNames()
+var maxRobots = 26 * 26 * 10 * 10 * 10
+var usedRobotNames = make(map[string]bool)
 
 // Name return a new name for the robot
 func (r *Robot) Name() (string, error) {
 	if r.name == "" {
-		if len(robots) == 0 { // exhausted all names and therefore start all over again
-			return "", errors.New("All names have been exhausted")
+		r.name = NewName()
+		for usedRobotNames[r.name] {
+			r.name = NewName()
+			if len(usedRobotNames) == maxRobots {
+				return "", errors.New("All names have been exhausted")
+			}
 		}
-		randomNumIndex := randomInt(0, len(robots))
-		r.name = robots[randomNumIndex]
-		robots = RemoveIndex(robots, randomNumIndex)
-
+		usedRobotNames[r.name] = true
 	}
 	return r.name, nil
 }
@@ -33,31 +35,22 @@ func (r *Robot) Reset() {
 	r.name = ""
 }
 
-// InitialiseRobotNames generates a slice with all possible robot combinations
-// when we randomly select a robot name, we just choose a random number and use it as an index
-func InitialiseRobotNames() []string {
-	var robots []string
-	for i := 65; i < 91; i++ {
-		for j := 65; j < 91; j++ {
-			for k := 0; k < 10; k++ {
-				for l := 0; l < 10; l++ {
-					for m := 0; m < 10; m++ {
-						newRobot := string(byte(i)) + string(byte(j)) + strconv.Itoa(k) + strconv.Itoa(l) + strconv.Itoa(m)
-						robots = append(robots, newRobot)
-					}
-				}
-			}
-		}
-	}
-	return robots
+// NewName generate a new robot name
+func NewName() string {
+	return randomString(2) + fmt.Sprintf("%03d", (randomInt(0, 1000)))
 }
 
+// randomInt generate a random number between min and max
 func randomInt(min, max int) int {
-	rand.Seed(time.Now().UnixNano())
-	return min + rand.Intn(max-min)
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	return min + r.Intn(max-min)
 }
 
-// RemoveIndex removes the element at index position specified and return a new slice
-func RemoveIndex(s []string, index int) []string {
-	return append(s[:index], s[index+1:]...)
+// Generate a random string of A-Z chars with length specified
+func randomString(length int) string {
+	bytes := make([]byte, length)
+	for i := 0; i < length; i++ {
+		bytes[i] = byte(randomInt(65, 91))
+	}
+	return string(bytes)
 }
