@@ -12,6 +12,7 @@ type Robot struct {
 	name string
 }
 
+var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 var maxRobots = 26 * 26 * 10 * 10 * 10
 var usedRobotNames = make(map[string]bool)
 
@@ -41,6 +42,6 @@ func (r *Robot) Reset() {
 func NewName() string {
 	r1 := string(r.Intn(26) + 'A')
 	r2 := string(r.Intn(26) + 'A')
-	num := rand.Intn(1000)
+	num := r.Intn(1000)
 	return fmt.Sprintf("%s%s%03d", r1, r2, num)
 }
