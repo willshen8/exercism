@@ -15,32 +15,25 @@ var ErrInput = errors.New("Error with inputs")
 var commentRegex = regexp.MustCompile(`#`)
 
 // Team struct records team's records
-type Team struct {
-	team   string
+type Result struct {
+	mp     int
 	wins   int
 	losses int
 	draws  int
-}
-
-// Points calculates the team's tally points
-func (t *Team) Points() int {
-	return t.wins*3 + t.draws
+	points int
 }
 
 // Tally takes an input from io.reader and outputs a team's results in table format via io.writer
 func Tally(r io.Reader, w io.Writer) error {
-	var teamResults []Team
-	reader := bufio.NewReader(r)
-	for {
-		line, _, err := reader.ReadLine()
-		if err == io.EOF {
-			break
-		}
-		if commentRegex.MatchString(string(line)) || string(line) == "" {
+	teamResults := make(map[string]*Result)
+	scanner := bufio.NewScanner(r)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if commentRegex.MatchString(line) || line == "" {
 			continue
 		}
 
-		results := strings.Split(string(line), ";")
+		results := strings.Split(line, ";")
 		if len(results) != 3 {
 			return ErrInput
 		}
@@ -48,50 +41,66 @@ func Tally(r io.Reader, w io.Writer) error {
 		teamB := results[1]
 		result := results[2]
 
-		if Find(teamResults, teamA) == -1 {
-			teamResults = append(teamResults, Team{team: teamA})
+		if _, ok := teamResults[teamA]; !ok {
+			teamResults[teamA] = &Result{}
 		}
-		if Find(teamResults, teamB) == -1 {
-			teamResults = append(teamResults, Team{team: teamB})
+		if _, ok := teamResults[teamB]; !ok {
+			teamResults[teamB] = &Result{}
 		}
+		teamResults[teamA].mp++
+		teamResults[teamB].mp++
 
 		switch result {
 		case "win":
-			teamResults[Find(teamResults, teamA)].wins++
-			teamResults[Find(teamResults, teamB)].losses++
+			teamResults[teamA].points += 3
+			teamResults[teamA].wins++
+			teamResults[teamB].losses++
 		case "loss":
-			teamResults[Find(teamResults, teamA)].losses++
-			teamResults[Find(teamResults, teamB)].wins++
+			teamResults[teamA].losses++
+			teamResults[teamB].wins++
+			teamResults[teamB].points += 3
 		case "draw":
-			teamResults[Find(teamResults, teamA)].draws++
-			teamResults[Find(teamResults, teamB)].draws++
+			teamResults[teamA].draws++
+			teamResults[teamA].points++
+			teamResults[teamB].draws++
+			teamResults[teamB].points++
 		default:
 			return ErrInput
 		}
 	}
 
-	sort.Slice(teamResults, func(i, j int) bool { return teamResults[i].team < teamResults[j].team })
-	sort.Slice(teamResults, func(i, j int) bool { return teamResults[i].Points() > teamResults[j].Points() })
+	sortedTeams := SortTeams(teamResults)
 
-	output := fmt.Sprintf("%-31v|%3v |%3v |%3v |%3v |%3v\n", "Team", "MP", "W", "D", "L", "P")
-	for _, result := range teamResults {
-		mp := result.draws + result.losses + result.wins
-		output += fmt.Sprintf("%-31v|%3v |%3v |%3v |%3v |%3v\n",
-			result.team, mp, result.wins, result.draws, result.losses, result.Points())
-	}
-
-	if _, err := w.Write([]byte(output)); err != nil {
-		fmt.Println(err)
+	fmt.Fprintf(w, "%-31v|%3v |%3v |%3v |%3v |%3v\n", "Team", "MP", "W", "D", "L", "P")
+	for _, team := range sortedTeams {
+		result := teamResults[team]
+		fmt.Fprintf(w, "%-31v|%3v |%3v |%3v |%3v |%3v\n",
+			team, result.mp, result.wins, result.draws, result.losses, result.points)
 	}
 	return nil
 }
 
-// Find returns the index of the team name and -1 if not found
-func Find(teams []Team, x string) int {
-	for i, n := range teams {
-		if x == n.team {
-			return i
-		}
+// SortedTeams sort a map of teams based on points and alphabetical order
+func SortTeams(teamResults map[string]*Result) []string {
+	teams := make([]string, 0, len(teamResults))
+	for team := range teamResults {
+		teams = append(teams, team)
 	}
-	return -1
+	sort.Strings(teams)
+
+	// using bubble sort to sort
+	for sorted := false; !sorted; {
+		swapped := false
+		for i := 0; i < len(teamResults)-1; i++ {
+			if teamResults[teams[i+1]].points > teamResults[teams[i]].points {
+				teams[i], teams[i+1] = teams[i+1], teams[i]
+				swapped = true
+			}
+		}
+		if !swapped {
+			sorted = true
+		}
+
+	}
+	return teams
 }
