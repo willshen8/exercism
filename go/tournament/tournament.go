@@ -8,30 +8,19 @@ import (
 	"strings"
 )
 
-// Team struct records team's records
+// Result records a team's records in the tournament
 type Result struct {
-	mp     int
-	wins   int
-	losses int
-	draws  int
-	points int
+	matches int
+	wins    int
+	losses  int
+	draws   int
+	points  int
 }
 
 // TeamPoints is a struct used to help with sorting by both team and points
 type TeamPoints struct {
 	team   string
 	points int
-}
-
-// SortedTeams sort a map of teams based on points and alphabetical order
-func SortTeams(teamResults map[string]Result) []TeamPoints {
-	teamPoints := make([]TeamPoints, 0, len(teamResults))
-	for team, result := range teamResults {
-		teamPoints = append(teamPoints, TeamPoints{team: team, points: result.points})
-	}
-	sort.Slice(teamPoints, func(i, j int) bool { return teamPoints[i].team < teamPoints[j].team })
-	sort.Slice(teamPoints, func(i, j int) bool { return teamPoints[i].points > teamPoints[j].points })
-	return teamPoints
 }
 
 // Tally takes an input from io.reader and outputs a team's results in table format via io.writer
@@ -53,8 +42,8 @@ func Tally(r io.Reader, w io.Writer) error {
 		result := results[2]
 
 		a, b := teamResults[teamA], teamResults[teamB]
-		a.mp++
-		b.mp++
+		a.matches++
+		b.matches++
 
 		switch result {
 		case "win":
@@ -76,13 +65,18 @@ func Tally(r io.Reader, w io.Writer) error {
 		teamResults[teamA], teamResults[teamB] = a, b
 	}
 
-	sortedTeams := SortTeams(teamResults)
+	teamPoints := make([]TeamPoints, 0, len(teamResults))
+	for team, result := range teamResults {
+		teamPoints = append(teamPoints, TeamPoints{team: team, points: result.points})
+	}
+	sort.Slice(teamPoints, func(i, j int) bool { return teamPoints[i].team < teamPoints[j].team })
+	sort.Slice(teamPoints, func(i, j int) bool { return teamPoints[i].points > teamPoints[j].points })
 
 	fmt.Fprintf(w, "%-31v|%3v |%3v |%3v |%3v |%3v\n", "Team", "MP", "W", "D", "L", "P")
-	for _, v := range sortedTeams {
+	for _, v := range teamPoints {
 		result := teamResults[v.team]
 		fmt.Fprintf(w, "%-31v|%3v |%3v |%3v |%3v |%3v\n",
-			v.team, result.mp, result.wins, result.draws, result.losses, result.points)
+			v.team, result.matches, result.wins, result.draws, result.losses, result.points)
 	}
 	return nil
 }
