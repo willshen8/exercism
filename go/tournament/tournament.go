@@ -9,7 +9,8 @@ import (
 )
 
 // Result records a team's records in the tournament
-type Result struct {
+type team struct {
+	name    string
 	matches int
 	wins    int
 	losses  int
@@ -17,15 +18,9 @@ type Result struct {
 	points  int
 }
 
-// TeamPoints is a struct used to help with sorting by both team and points
-type TeamPoints struct {
-	team   string
-	points int
-}
-
 // Tally takes an input from io.reader and outputs a team's results in table format via io.writer
 func Tally(r io.Reader, w io.Writer) error {
-	teamResults := make(map[string]Result)
+	teamResults := make(map[string]team)
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -37,11 +32,10 @@ func Tally(r io.Reader, w io.Writer) error {
 		if len(results) != 3 {
 			return fmt.Errorf("Error with reading input, received: %s", line)
 		}
-		teamA := results[0]
-		teamB := results[1]
-		result := results[2]
+		teamA, teamB, result := results[0], results[1], results[2]
 
 		a, b := teamResults[teamA], teamResults[teamB]
+		a.name, b.name = teamA, teamB
 		a.matches++
 		b.matches++
 
@@ -65,23 +59,23 @@ func Tally(r io.Reader, w io.Writer) error {
 		teamResults[teamA], teamResults[teamB] = a, b
 	}
 
-	teamPoints := make([]TeamPoints, 0, len(teamResults))
-	for team, result := range teamResults {
-		teamPoints = append(teamPoints, TeamPoints{team: team, points: result.points})
+	sortedTeamResults := make([]team, 0, len(teamResults))
+	for _, result := range teamResults {
+		sortedTeamResults = append(sortedTeamResults, result)
 	}
 
-	sort.Slice(teamPoints, func(i, j int) bool {
-		if teamPoints[i].points != teamPoints[j].points {
-			return teamPoints[i].points > teamPoints[j].points
+	sort.Slice(sortedTeamResults, func(i, j int) bool {
+		if sortedTeamResults[i].points != sortedTeamResults[j].points {
+			return sortedTeamResults[i].points > sortedTeamResults[j].points
 		}
-		return teamPoints[i].team < teamPoints[j].team
+		return sortedTeamResults[i].name < sortedTeamResults[j].name
 	})
 
 	fmt.Fprintf(w, "%-31v|%3v |%3v |%3v |%3v |%3v\n", "Team", "MP", "W", "D", "L", "P")
-	for _, v := range teamPoints {
-		result := teamResults[v.team]
+	for _, v := range sortedTeamResults {
+		result := teamResults[v.name]
 		fmt.Fprintf(w, "%-31v|%3v |%3v |%3v |%3v |%3v\n",
-			v.team, result.matches, result.wins, result.draws, result.losses, result.points)
+			v.name, result.matches, result.wins, result.draws, result.losses, result.points)
 	}
 	return nil
 }
