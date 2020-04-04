@@ -69,8 +69,13 @@ func Tally(r io.Reader, w io.Writer) error {
 	for team, result := range teamResults {
 		teamPoints = append(teamPoints, TeamPoints{team: team, points: result.points})
 	}
-	sort.Slice(teamPoints, func(i, j int) bool { return teamPoints[i].team < teamPoints[j].team })
-	sort.Slice(teamPoints, func(i, j int) bool { return teamPoints[i].points > teamPoints[j].points })
+
+	sort.Slice(teamPoints, func(i, j int) bool {
+		if teamPoints[i].points != teamPoints[j].points {
+			return teamPoints[i].points > teamPoints[j].points
+		}
+		return teamPoints[i].team < teamPoints[j].team
+	})
 
 	fmt.Fprintf(w, "%-31v|%3v |%3v |%3v |%3v |%3v\n", "Team", "MP", "W", "D", "L", "P")
 	for _, v := range teamPoints {
