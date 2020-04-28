@@ -3,10 +3,11 @@ package erratum
 // Use open a resource and handles errors if resources not successful
 func Use(o ResourceOpener, input string) (err error) {
 	resource, err := o()
-	if _, ok := err.(TransientError); ok {
-		return Use(o, input)
-	} else if err != nil {
-		return
+	for err != nil {
+		if _, ok := err.(TransientError); !ok {
+			return
+		}
+		resource, err = o()
 	}
 	defer func() {
 		if r := recover(); r != nil {
@@ -23,6 +24,5 @@ func Use(o ResourceOpener, input string) (err error) {
 	}()
 	resource.Frob(input)
 	defer resource.Close()
-
 	return
 }
