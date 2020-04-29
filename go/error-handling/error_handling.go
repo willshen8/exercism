@@ -5,10 +5,11 @@ func Use(o ResourceOpener, input string) (err error) {
 	resource, err := o()
 	for err != nil {
 		if _, ok := err.(TransientError); !ok {
-			return
+			return err
 		}
 		resource, err = o()
 	}
+	defer resource.Close()
 	defer func() {
 		if r := recover(); r != nil {
 			v, ok := r.(FrobError)
@@ -18,11 +19,10 @@ func Use(o ResourceOpener, input string) (err error) {
 			} else {
 				err = r.(error)
 			}
-
 		}
 		resource.Close()
 	}()
+
 	resource.Frob(input)
-	defer resource.Close()
-	return
+	return nil
 }
