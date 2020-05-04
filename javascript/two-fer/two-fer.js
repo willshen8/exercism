@@ -1,9 +1,7 @@
-export const twoFer = (...args) => {
-  const [name] = args
-  switch (name) {
-    case undefined:
-      return "One for you, one for me."
-    default:
-      return "One for " + name + ", one for me."
-  }
-};
+export const twoFer = (name="") => {
+    if (name== ""){
+      return `One for you, one for me.`
+    } else {
+      return `One for ${name}, one for me.`
+    } 
+}

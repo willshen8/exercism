@@ -1,1 +1,3 @@
+.gitignore
 metadata.json
+node_modules
