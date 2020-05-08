@@ -8,29 +8,31 @@ type bucket struct {
 	startBucket  bool
 }
 
+// Solve resolves whether two buckets can reach a goal limit by pouring water in and out and the buckets
 func Solve(sizeBucketOne, sizeBucketTwo, goalAmount int, startBucket string) (goalBucket string, numSteps, otherBucketLevel int, e error) {
+	if goalAmount <= 0 {
+		return "", numSteps, 0, errors.New("invalid goal amount")
+	}
+	if sizeBucketOne <= 0 || sizeBucketTwo <= 0 {
+		return "", numSteps, 0, errors.New("bucket size must be positive")
+	}
+	if sizeBucketTwo&sizeBucketOne == 0 {
+		return "", numSteps, 0, errors.New("solution can't be found, two bucket sizes must be prime relative to each other")
+	}
+
 	bucketOne := &bucket{capacity: sizeBucketOne}
 	bucketTwo := &bucket{capacity: sizeBucketTwo}
-
 	switch startBucket {
 	case "one":
 		bucketOne.pourIn(bucketOne.capacity)
-		bucketOne.setStartBucket()
+		bucketOne.startBucket = true
 	case "two":
 		bucketTwo.pourIn(bucketTwo.capacity)
-		bucketTwo.setStartBucket()
+		bucketTwo.startBucket = true
 	default:
 		return "", 0, 0, errors.New("invalid starting bucket")
 	}
 	numSteps++
-
-	if goalAmount <= 0 {
-		return "", numSteps, 0, errors.New("invalid goal amount")
-	}
-
-	if sizeBucketOne <= 0 || sizeBucketTwo <= 0 {
-		return "", numSteps, 0, errors.New("bucket one size must be positive")
-	}
 
 	for (bucketOne.currentLevel != goalAmount) && (bucketTwo.currentLevel != goalAmount) {
 		// if non starting bucket capacity equals to goal amount
@@ -43,11 +45,12 @@ func Solve(sizeBucketOne, sizeBucketTwo, goalAmount int, startBucket string) (go
 			numSteps++
 			break
 		}
+
 		// if none starting bucket is full and other is not empty nor full, then empty non-starting
-		if !bucketOne.startBucket && bucketOne.currentLevel == bucketOne.capacity && bucketTwo.capacity != 0 && bucketTwo.currentLevel != bucketTwo.capacity {
+		if !bucketOne.startBucket && bucketOne.currentLevel == bucketOne.capacity {
 			bucketOne.empty()
 			numSteps++
-		} else if !bucketTwo.startBucket && bucketTwo.currentLevel == bucketTwo.capacity && bucketOne.capacity != 0 && bucketOne.currentLevel != bucketOne.capacity {
+		} else if !bucketTwo.startBucket && bucketTwo.currentLevel == bucketTwo.capacity {
 			bucketTwo.empty()
 			numSteps++
 		}
@@ -87,19 +90,12 @@ func Solve(sizeBucketOne, sizeBucketTwo, goalAmount int, startBucket string) (go
 
 	if bucketOne.currentLevel == goalAmount {
 		return "one", numSteps, bucketTwo.currentLevel, nil
-	} else if bucketTwo.currentLevel == goalAmount {
-		return "two", numSteps, bucketOne.currentLevel, nil
 	} else {
-		return "", 0, 0, errors.New("can't be solved")
+		return "two", numSteps, bucketOne.currentLevel, nil
 	}
 
 }
 
-func (b *bucket) setStartBucket() {
-	b.startBucket = true
-}
-
-// Empty bucket empty its contents
 func (b *bucket) empty() {
 	b.currentLevel = 0
 }
