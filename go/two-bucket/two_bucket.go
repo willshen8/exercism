@@ -90,9 +90,8 @@ func Solve(sizeBucketOne, sizeBucketTwo, goalAmount int, startBucket string) (go
 
 	if bucketOne.currentLevel == goalAmount {
 		return "one", numSteps, bucketTwo.currentLevel, nil
-	} else {
-		return "two", numSteps, bucketOne.currentLevel, nil
 	}
+	return "two", numSteps, bucketOne.currentLevel, nil
 
 }
 
