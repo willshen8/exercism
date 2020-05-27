@@ -1,4 +1,3 @@
-export const gigasecond = date => {
-  const TeraMilliseconds = 1e12
-  return new Date((date.getTime() + TeraMilliseconds))
-}
+const TeraMilliseconds = 1e12
+
+export const gigasecond = date => new Date((date.getTime() + TeraMilliseconds))
