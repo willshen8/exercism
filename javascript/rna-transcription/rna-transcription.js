@@ -1,22 +1,10 @@
-export const toRna = dna => {
-  let result = ''
-  for (let strand of dna) {
-    result += DnaToRna(strand)
-  }
-  return result
+const transcription = {
+  G: 'C',
+  C: 'G',
+  T: 'A',
+  T: 'A',
+  A: 'U'
 }
 
-const DnaToRna = strand => {
-  switch (strand) {
-    case 'G':
-      return 'C'
-    case 'C':
-      return 'G'
-    case 'T':
-      return 'A'
-    case 'A':
-      return 'U'
-    default:
-      return ''
-  }
-}
+export const toRna = dna =>
+    dna.split('').map(nucleotides => transcription[nucleotides]).join('')
