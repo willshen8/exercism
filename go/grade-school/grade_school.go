@@ -31,7 +31,7 @@ func (s *School) Add(name string, level int) {
 	s.levels = append(s.levels, Grade{level: level, students: []string{name}})
 }
 
-// Grade returns a list of all students in a particular grade sorted by name
+// Grade returns a list of all students in a particular grade
 func (s *School) Grade(grade int) []string {
 	var result []string
 	for _, v := range s.levels {
@@ -39,7 +39,6 @@ func (s *School) Grade(grade int) []string {
 			result = v.students
 		}
 	}
-	sort.Slice(result, func(i, j int) bool { return result[i] < result[j] })
 	return result
 }
 
