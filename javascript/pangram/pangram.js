@@ -1,10 +1,11 @@
+const numberOfLetters = 26
+
 export const isPangram = sentence => {
-  let letterMap = new Map()
+  let letterSet = new Set()
   sentence.split('').map(letter => {
     if (letter.toLowerCase() >= 'a' && letter.toLowerCase() <= 'z') {
-      letterMap.set(letter.toLowerCase(), true)
+      letterSet.add(letter.toLowerCase())
     }
   })
-  if (letterMap.size == 26) return true
-  return false
+  return letterSet.size == numberOfLetters
 }
