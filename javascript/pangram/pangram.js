@@ -1,11 +1,6 @@
-const numberOfLetters = 26
+const lettersInEnglishAlphabet = 26
 
 export const isPangram = sentence => {
-  let letterSet = new Set()
-  sentence.split('').map(letter => {
-    if (letter.toLowerCase() >= 'a' && letter.toLowerCase() <= 'z') {
-      letterSet.add(letter.toLowerCase())
-    }
-  })
-  return letterSet.size == numberOfLetters
+  let alphabetSet = new Set(sentence.toLowerCase().replace(/[^A-Za-z]/g, ''))
+  return alphabetSet.size == lettersInEnglishAlphabet
 }
