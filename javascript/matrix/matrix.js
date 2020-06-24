@@ -9,14 +9,12 @@ export class Matrix {
 
   get columns() {
     if (this.matrix.length < 2) return this.matrix
-    const columns = []
-    for (let i = 0; i < this.matrix[0].length; i++) {
-      let column = []
-      for (let j = 0; j < this.matrix.length; j++) {
-        column.push(this.matrix[j][i])
-      }
-      columns.push(column)
-    }
+    const columns = new Array(this.matrix[0].length).fill(0).map(() => new Array(this.matrix.length).fill(0));
+    this.matrix.map((row, i) => {
+      row.map((e, j) => {
+        columns[j][i] = e
+      })
+    })
     return columns
   }
 }
