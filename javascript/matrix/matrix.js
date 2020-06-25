@@ -19,10 +19,8 @@ export class Matrix {
   }
 
   get columns() {
-    if (!this._columns) {
-      if (!this._rows) this.rows
-      return Matrix.transpose(this._rows)
-    }
+    if (!this._columns)
+      this._columns = Matrix.transpose(this.rows)
     return this._columns
   }
 }
