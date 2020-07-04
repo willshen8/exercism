@@ -6,8 +6,8 @@ export const hey = (message) => {
 }
 
 //  Helper functions
-const isShouting = message => /^[A-Z]+$/.test(message.replace(/[^a-zA-Z]/g, ""))
-const isSilence = message => message.replace(/[^a-zA-Z0-9!?]/g, "") === ""
+const isShouting = message => message.toUpperCase() === message && /[A-Z]/.test(message)
+const isSilence = message => message === ""
 const isAsking = message => message[message.length - 1] === '?'
 
 // List of situations
@@ -17,9 +17,7 @@ const SITUATIONS = [{
   },
   {
     answer: "Calm down, I know what I'm doing!",
-    test: function (message) {
-      return isAsking(message) && isShouting(message)
-    }
+    test: message => isAsking(message) && isShouting(message)
   },
   {
     answer: "Sure.",
@@ -31,8 +29,6 @@ const SITUATIONS = [{
   },
   {
     answer: "Whatever.",
-    test: function () {
-      return true
-    }
+    test: () => true
   }
 ]
