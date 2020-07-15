@@ -1,14 +1,14 @@
 export const rows = (number) => {
-  let pascalTriangles = new Array
+  const pascalTriangles = new Array
   if (number <= 0)
     return pascalTriangles
   pascalTriangles.push([1])
   for (let i = 2; i < number + 1; i++) {
-    let pascalRow = new Array(i)
+    const pascalRow = new Array(i)
     pascalRow[0] = 1
     pascalRow[i - 1] = 1
     for (let j = 1; j < i - 1; j++) {
-      pascalRow[j] = parseInt(pascalTriangles[i - 2][j - 1] + pascalTriangles[i - 2][j])
+      pascalRow[j] = pascalTriangles[i - 2][j - 1] + pascalTriangles[i - 2][j]
     }
     pascalTriangles.push(pascalRow)
   }
