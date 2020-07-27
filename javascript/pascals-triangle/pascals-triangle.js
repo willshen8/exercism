@@ -1,10 +1,9 @@
 export const rows = (number) => {
-  const pascalTriangles = new Array
-  if (number <= 0)
-    return pascalTriangles
+  const pascalTriangles = []
+  if (number <= 0) return pascalTriangles
   pascalTriangles.push([1])
   for (let i = 2; i < number + 1; i++) {
-    const pascalRow = new Array(i)
+    const pascalRow = []
     pascalRow[0] = 1
     pascalRow[i - 1] = 1
     for (let j = 1; j < i - 1; j++) {
