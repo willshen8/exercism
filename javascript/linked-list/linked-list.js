@@ -1,7 +1,3 @@
-import {
-  isNull
-} from "util"
-
 export class LinkedList {
   constructor() {
     this.head = null
@@ -51,7 +47,7 @@ export class LinkedList {
     return shiftedNode.data
   }
 
-  // unshift inserts value at front
+  // unshift inserts a new value at front
   unshift(nodeValue) {
     const newNode = new Node(nodeValue)
     const oldHead = this.head
@@ -94,7 +90,6 @@ export class LinkedList {
       this.head = currentNode.next
       this.tail = currentNode.next
     }
-
   }
 
   // count output the number of nodes in the linked list
