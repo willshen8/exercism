@@ -37,12 +37,9 @@ export class LinkedList {
   shift() {
     const shiftedNode = this.head
     const newHead = this.head.next
-    if (!this.head) {
-      return
-    }
-    if (!newHead) {
+    if (!this.head) return
+    if (!newHead)
       this.tail = newHead
-    }
     this.head = newHead
     return shiftedNode.data
   }
@@ -63,32 +60,29 @@ export class LinkedList {
 
   // delete the first occurrence of a specified value
   delete(deleteValue) {
-    let currentNode = null
+    let deleteNode = null
     let nextNode = null
     let prevNode = null
     if (this.head) {
-      currentNode = this.head
-      while (currentNode.data !== deleteValue) {
-        if (currentNode.next === null) return
-        currentNode = currentNode.next
+      deleteNode = this.head
+      while (deleteNode.data !== deleteValue) {
+        if (deleteNode.next === null) return
+        deleteNode = deleteNode.next
       }
     }
 
-    if (currentNode && currentNode.next && currentNode.prev) {
-      nextNode = currentNode.next
-      prevNode = currentNode.prev
-      prevNode.next = nextNode
-      nextNode.prev = prevNode
-    } else if (currentNode !== this.head && !currentNode.next) {
-      prevNode = currentNode.prev
+    if (deleteNode == this.head) {
+      this.head = deleteNode.next
+      this.tail = deleteNode.next
+    } else if (deleteNode == this.tail) {
+      prevNode = deleteNode.prev
       prevNode.next = null
       this.tail = prevNode
-    } else if (currentNode == this.head && !currentNode.next) {
-      this.head = null
-      this.tail = null
-    } else if (currentNode && !currentNode.prev) {
-      this.head = currentNode.next
-      this.tail = currentNode.next
+    } else {
+      nextNode = deleteNode.next
+      prevNode = deleteNode.prev
+      prevNode.next = nextNode
+      nextNode.prev = prevNode
     }
   }
 
@@ -96,12 +90,10 @@ export class LinkedList {
   count() {
     let count = 0
     if (!this.head) return 0
-    else {
-      let currentNode = this.head
-      while (currentNode !== null) {
-        count++
-        currentNode = currentNode.next
-      }
+    let currentNode = this.head
+    while (currentNode !== null) {
+      count++
+      currentNode = currentNode.next
     }
     return count
   }
