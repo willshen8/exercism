@@ -1,6 +1,6 @@
 export class LinkedList {
   constructor() {
-    this.head = null 
+    this.head = null
     this.tail = null
   }
 
@@ -9,40 +9,29 @@ export class LinkedList {
     const newNode = new Node(nodeValue)
     const oldTail = this.tail
     if (!this.head) {
-      this.head = newNode 
+      this.head = newNode
       this.tail = newNode
-    }
-    else {
+    } else {
       oldTail.next = newNode
-      newNode.prev = oldTail 
+      newNode.prev = oldTail
       this.tail = newNode
     }
   }
 
   // Pop removes the element at back
   pop() {
-    if (!this.tail) return 
-    const popNode = this.tail
-      if (this.head !== this.tail) {
-        const newTail = this.tail.prev
-        newTail.next = null 
-        this.tail = newTail
-      }
-    else {
-      this.head = null 
-      this.tail = null
-    }
-    return popNode.data
+    if (!this.tail) return
+    const poppedData = this.tail.data
+    this.deleteNode(this.tail)
+    return poppedData
   }
 
   // shift removes the element from the beginning of the list
   shift() {
-    const shiftedNode = this.head
-    const newHead = this.head.next
-    if (!this.head) return 
-    if (!newHead) this.tail = newHead 
-    this.head = newHead
-    return shiftedNode.data
+    if (!this.head) return
+    const shiftedData = this.head.data
+    this.deleteNode(this.head)
+    return shiftedData
   }
 
   // unshift inserts a new value at front
@@ -50,12 +39,11 @@ export class LinkedList {
     const newNode = new Node(nodeValue)
     const oldHead = this.head
     if (!this.head) {
-      this.head = newNode 
+      this.head = newNode
       this.tail = newNode
-    }
-    else {
+    } else {
       oldHead.prev = newNode
-      newNode.next = oldHead 
+      newNode.next = oldHead
       this.head = newNode
     }
   }
@@ -85,7 +73,7 @@ export class LinkedList {
       searchNode = this.head
       while (searchNode.data !== value) {
         if (searchNode.next === null) {
-            return
+          return
         }
         searchNode = searchNode.next
       }
@@ -93,20 +81,19 @@ export class LinkedList {
     }
   }
 
-  // deleteNode removes deleteNode from the likedList
-  deleteNode(deleteNode){
+  // deleteNode removes a node from the likedList
+  deleteNode(node) {
     let nextNode = null
     let prevNode = null
-    if (deleteNode == this.head) {
-      this.head = deleteNode.next 
-      this.tail = deleteNode.next
-    } else if (deleteNode == this.tail) {
-      prevNode = deleteNode.prev
-      prevNode.next = null 
+    if (node == this.head) {
+      this.head = node.next
+    } else if (node == this.tail) {
+      prevNode = node.prev
+      prevNode.next = null
       this.tail = prevNode
     } else {
-      nextNode = deleteNode.next
-      prevNode = deleteNode.prev
+      nextNode = node.next
+      prevNode = node.prev
       prevNode.next = nextNode
       nextNode.prev = prevNode
     }
@@ -115,8 +102,8 @@ export class LinkedList {
 
 class Node {
   constructor(data, prev = null, next = null) {
-    this.data = data 
-    this.prev = prev 
+    this.data = data
+    this.prev = prev
     this.next = next
   }
 }
