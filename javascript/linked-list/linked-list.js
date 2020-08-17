@@ -6,16 +6,7 @@ export class LinkedList {
 
   // push insert an element at the back of the list
   push(nodeValue) {
-    const newNode = new Node(nodeValue)
-    const oldTail = this.tail
-    if (!this.head) {
-      this.head = newNode
-      this.tail = newNode
-    } else {
-      oldTail.next = newNode
-      newNode.prev = oldTail
-      this.tail = newNode
-    }
+    this.insertNode(nodeValue, this.count)
   }
 
   // Pop removes the element at back
@@ -36,16 +27,7 @@ export class LinkedList {
 
   // unshift inserts a new value at front
   unshift(nodeValue) {
-    const newNode = new Node(nodeValue)
-    const oldHead = this.head
-    if (!this.head) {
-      this.head = newNode
-      this.tail = newNode
-    } else {
-      oldHead.prev = newNode
-      newNode.next = oldHead
-      this.head = newNode
-    }
+    this.insertNode(nodeValue, 1)
   }
 
   // delete the first occurrence of a specified value
@@ -83,22 +65,44 @@ export class LinkedList {
 
   // deleteNode removes a node from the likedList
   deleteNode(node) {
-    let nextNode = null
-    let prevNode = null
     if (node == this.head) {
       this.head = node.next
     } else if (node == this.tail) {
-      prevNode = node.prev
-      prevNode.next = null
-      this.tail = prevNode
+      this.tail.prev.next = null
+      this.tail = this.tail.prev
     } else {
-      nextNode = node.next
-      prevNode = node.prev
-      prevNode.next = nextNode
-      nextNode.prev = prevNode
+      node.prev.next = node.next
+      node.next.prev = node.prev
+    }
+  }
+
+  // insertNode adds a node insert the linked list
+  insertNode(nodeValue, index) {
+    const newNode = new Node(nodeValue)
+    if (!this.head) {
+      this.head = newNode
+      this.tail = newNode
+    } else if (index == 1) {
+      this.head.prev = newNode
+      newNode.next = this.head
+      this.head = newNode
+    } else if (index == this.count) {
+      newNode.prev = this.tail
+      this.tail.next = newNode
+      this.tail = newNode
+    } else {
+      let currNode = this.head
+      let incr = 1
+      while (currNode.next !== null && incr < index) {
+        currNode = currNode.next
+        incr++
+      }
+      newNode.next = currNode.next
+      currNode.next = newNode
     }
   }
 }
+
 
 class Node {
   constructor(data, prev = null, next = null) {
