@@ -30,6 +30,7 @@ const (
 	HighHand
 )
 
+// rankedHand is a struct that includes the original cards, the faces and its ranking
 type rankedHand struct {
 	hand    string
 	numbers []int
@@ -40,16 +41,8 @@ func BestHand(hands []string) ([]string, error) {
 	var result []string
 	var rankedHands []rankedHand
 
-	if len(hands) == 1 {
-		_, err := DetermineHandRanking(hands[0])
-		if err != nil {
-			return result, err
-		}
-		return hands, nil
-	}
-
-	for _, v := range hands {
-		rankedHand, err := DetermineHandRanking(v)
+	for _, hand := range hands {
+		rankedHand, err := DetermineHandRanking(hand)
 		if err != nil {
 			return result, err
 		} else {
@@ -77,14 +70,7 @@ func BestHand(hands []string) ([]string, error) {
 			var highestTriplet int
 			var highestPair int
 			for _, hand := range highestRankedHands {
-				var numFrequencyMap = make(map[int]int, 2)
-				for _, v := range hand.numbers {
-					if _, ok := numFrequencyMap[v]; !ok {
-						numFrequencyMap[v] = 1
-					} else {
-						numFrequencyMap[v]++
-					}
-				}
+				numFrequencyMap := NewCardFrequencyMap(hand.numbers, 2)
 				for k, v := range numFrequencyMap {
 					if v == 3 && k > highestTriplet {
 						highestTriplet = k
@@ -96,40 +82,19 @@ func BestHand(hands []string) ([]string, error) {
 
 			var deleteFullHouseIndices []int
 			for index, hand := range highestRankedHands {
-				var numFrequencyMap = make(map[int]int, 2)
-				for _, v := range hand.numbers {
-					if _, ok := numFrequencyMap[v]; !ok {
-						numFrequencyMap[v] = 1
-					} else {
-						numFrequencyMap[v]++
-					}
-				}
+				numFrequencyMap := NewCardFrequencyMap(hand.numbers, 2)
 				for k, v := range numFrequencyMap {
 					if v == 3 && k < highestTriplet {
 						deleteFullHouseIndices = append(deleteFullHouseIndices, index)
 					}
 				}
 			}
-
-			for len(deleteFullHouseIndices) > 0 {
-				highestRankedHands = append(highestRankedHands[:deleteFullHouseIndices[0]], highestRankedHands[deleteFullHouseIndices[0]+1:]...)
-				deleteFullHouseIndices = append(deleteFullHouseIndices[:0], deleteFullHouseIndices[1:]...)
-				for i := range deleteFullHouseIndices {
-					deleteFullHouseIndices[i]--
-				}
-			}
+			highestRankedHands = DeleteLowerRankedCards(highestRankedHands, deleteFullHouseIndices)
 
 			if len(highestRankedHands) > 1 {
 				var deletePairIndices []int
 				for index, hand := range highestRankedHands {
-					var numFrequencyMap = make(map[int]int, 2)
-					for _, v := range hand.numbers {
-						if _, ok := numFrequencyMap[v]; !ok {
-							numFrequencyMap[v] = 1
-						} else {
-							numFrequencyMap[v]++
-						}
-					}
+					numFrequencyMap := NewCardFrequencyMap(hand.numbers, 2)
 					for k, v := range numFrequencyMap {
 						if v == 2 && k < highestPair {
 							deletePairIndices = append(deletePairIndices, index)
@@ -137,13 +102,7 @@ func BestHand(hands []string) ([]string, error) {
 					}
 				}
 
-				for len(deletePairIndices) > 0 {
-					highestRankedHands = append(highestRankedHands[:deletePairIndices[0]], highestRankedHands[deletePairIndices[0]+1:]...)
-					deletePairIndices = append(deletePairIndices[:0], deletePairIndices[1:]...)
-					for i := range deletePairIndices {
-						deletePairIndices[i]--
-					}
-				}
+				highestRankedHands = DeleteLowerRankedCards(highestRankedHands, deletePairIndices)
 			}
 			for _, v := range highestRankedHands {
 				result = append(result, v.hand)
@@ -152,31 +111,13 @@ func BestHand(hands []string) ([]string, error) {
 		} else if highestRankedHands[0].rank == FourOfAKind {
 			var highestQuadruplet int
 			for _, hand := range highestRankedHands {
-				var numFrequencyMap = make(map[int]int, 1)
-				for _, v := range hand.numbers {
-					if _, ok := numFrequencyMap[v]; !ok {
-						numFrequencyMap[v] = 1
-					} else {
-						numFrequencyMap[v]++
-					}
-				}
-				for k, v := range numFrequencyMap {
-					if v == 4 && k > highestQuadruplet {
-						highestQuadruplet = k
-					}
-				}
+				numFrequencyMap := NewCardFrequencyMap(hand.numbers, 2)
+				highestQuadruplet = HighestCard(numFrequencyMap, 4)
 			}
 
 			var deleteFourOfAKindIndices []int
 			for index, hand := range highestRankedHands {
-				var numFrequencyMap = make(map[int]int, 2)
-				for _, v := range hand.numbers {
-					if _, ok := numFrequencyMap[v]; !ok {
-						numFrequencyMap[v] = 1
-					} else {
-						numFrequencyMap[v]++
-					}
-				}
+				numFrequencyMap := NewCardFrequencyMap(hand.numbers, 2)
 				for k, v := range numFrequencyMap {
 					if v == 4 && k < highestQuadruplet {
 						deleteFourOfAKindIndices = append(deleteFourOfAKindIndices, index)
@@ -184,56 +125,24 @@ func BestHand(hands []string) ([]string, error) {
 				}
 			}
 
-			for len(deleteFourOfAKindIndices) > 0 {
-				highestRankedHands = append(highestRankedHands[:deleteFourOfAKindIndices[0]], highestRankedHands[deleteFourOfAKindIndices[0]+1:]...)
-				deleteFourOfAKindIndices = append(deleteFourOfAKindIndices[:0], deleteFourOfAKindIndices[1:]...)
-				for i := range deleteFourOfAKindIndices {
-					deleteFourOfAKindIndices[i]--
-				}
-			}
+			highestRankedHands = DeleteLowerRankedCards(highestRankedHands, deleteFourOfAKindIndices)
+
 			if len(highestRankedHands) > 1 {
 				var highestKicker int
-
 				for _, hand := range highestRankedHands {
-					var numFrequencyMap = make(map[int]int, 2)
-					for _, v := range hand.numbers {
-						if _, ok := numFrequencyMap[v]; !ok {
-							numFrequencyMap[v] = 1
-						} else {
-							numFrequencyMap[v]++
-						}
-					}
-					for k, v := range numFrequencyMap {
-						if v == 1 && k > highestKicker {
-							highestKicker = k
-						}
-					}
-
+					numFrequencyMap := NewCardFrequencyMap(hand.numbers, 2)
+					highestKicker = HighestCard(numFrequencyMap, 1) // kicker is a single card: freq=1
 				}
 				var deleteKickerIndices []int
 				for index, hand := range highestRankedHands {
-					var numFrequencyMap = make(map[int]int, 2)
-					for _, v := range hand.numbers {
-						if _, ok := numFrequencyMap[v]; !ok {
-							numFrequencyMap[v] = 1
-						} else {
-							numFrequencyMap[v]++
-						}
-					}
+					numFrequencyMap := NewCardFrequencyMap(hand.numbers, 2)
 					for k, v := range numFrequencyMap {
 						if v == 1 && k < highestKicker {
 							deleteKickerIndices = append(deleteKickerIndices, index)
 						}
 					}
 				}
-
-				for len(deleteKickerIndices) > 0 {
-					highestRankedHands = append(highestRankedHands[:deleteKickerIndices[0]], highestRankedHands[deleteKickerIndices[0]+1:]...)
-					deleteKickerIndices = append(deleteKickerIndices[:0], deleteKickerIndices[1:]...)
-					for i := range deleteKickerIndices {
-						deleteKickerIndices[i]--
-					}
-				}
+				highestRankedHands = DeleteLowerRankedCards(highestRankedHands, deleteKickerIndices)
 			}
 
 			for _, v := range highestRankedHands {
@@ -259,14 +168,7 @@ func BestHand(hands []string) ([]string, error) {
 					deleteIndices = append(deleteIndices, index)
 				}
 			}
-
-			for len(deleteIndices) > 0 {
-				highestRankedHands = append(highestRankedHands[:deleteIndices[0]], highestRankedHands[deleteIndices[0]+1:]...)
-				deleteIndices = append(deleteIndices[:0], deleteIndices[1:]...)
-				for i := range deleteIndices {
-					deleteIndices[i]--
-				}
-			}
+			highestRankedHands = DeleteLowerRankedCards(highestRankedHands, deleteIndices)
 		}
 	}
 
@@ -278,7 +180,6 @@ func BestHand(hands []string) ([]string, error) {
 }
 
 // DetermineHandRanking parses and validate the cards and return the ranking and error
-// if exists
 func DetermineHandRanking(hand string) (rankedHand, error) {
 	parsedCards := strings.Split(hand, " ")
 	result := rankedHand{hand: hand}
@@ -309,16 +210,9 @@ func DetermineHandRanking(hand string) (rankedHand, error) {
 
 		numbers = append(numbers, CardNumbers[number])
 		suits = append(suits, suit)
+	}
+	numbFrequencyMap := NewCardFrequencyMap(numbers, 5)
 
-	}
-	var numbFrequencyMap = make(map[int]int, 5)
-	for _, v := range numbers {
-		if _, ok := numbFrequencyMap[v]; !ok {
-			numbFrequencyMap[v] = 1
-		} else {
-			numbFrequencyMap[v]++
-		}
-	}
 	// get the values of the numbersMap
 	var cardFrequency []int
 	for _, v := range numbFrequencyMap {
@@ -327,6 +221,7 @@ func DetermineHandRanking(hand string) (rankedHand, error) {
 
 	sort.Sort(sort.Reverse(sort.IntSlice(cardFrequency)))
 	sort.Sort(sort.Reverse(sort.IntSlice(numbers)))
+
 	isStraightFlag := IsStraight(numbers)
 	isFlushFlag := IsFlush(suits)
 	// if A exists in a low straight, then treat is as a lower card
@@ -347,7 +242,7 @@ func DetermineHandRanking(hand string) (rankedHand, error) {
 		return result, nil
 	}
 
-	var threeOfAKind bool = false
+	var threeOfAKind bool
 	var twoPairs int
 	for _, v := range cardFrequency {
 		if v == 4 {
@@ -361,20 +256,52 @@ func DetermineHandRanking(hand string) (rankedHand, error) {
 	}
 	if threeOfAKind && twoPairs == 1 {
 		result.rank = FullHouse
-		return result, nil
 	} else if threeOfAKind {
 		result.rank = ThreeOfAKind
-		return result, nil
 	} else if twoPairs == 2 {
 		result.rank = TwoPair
-		return result, nil
 	} else if twoPairs == 1 {
 		result.rank = OnePair
-		return result, nil
+	} else {
+		result.rank = HighHand
 	}
-
-	result.rank = HighHand
 	return result, nil
+}
+
+// NewCardFrequencyMap returns the frequency of the card faces occurrence as a map
+func NewCardFrequencyMap(numbers []int, capacity int) map[int]int {
+	var numbFrequencyMap = make(map[int]int, capacity)
+	for _, v := range numbers {
+		if _, ok := numbFrequencyMap[v]; !ok {
+			numbFrequencyMap[v] = 1
+		} else {
+			numbFrequencyMap[v]++
+		}
+	}
+	return numbFrequencyMap
+}
+
+// DeleteLowerRankedCards deletes elements from the resulting slice as per indices
+func DeleteLowerRankedCards(hands []rankedHand, indices []int) []rankedHand {
+	for len(indices) > 0 {
+		hands = append(hands[:indices[0]], hands[indices[0]+1:]...)
+		indices = append(indices[:0], indices[1:]...)
+		for i := range indices {
+			indices[i]--
+		}
+	}
+	return hands
+}
+
+// HighestCard finds the highest card given a card number (e.g. triplet, pair, single) in a freqency map
+func HighestCard(freqMap map[int]int, freq int) int {
+	var highestCardNum int
+	for k, v := range freqMap {
+		if v == freq && k > highestCardNum {
+			highestCardNum = k
+		}
+	}
+	return highestCardNum
 }
 
 // Contains return a bool if s exists in collection slice
