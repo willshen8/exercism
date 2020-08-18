@@ -6,7 +6,7 @@ export class LinkedList {
 
   // push insert an element at the back of the list
   push(nodeValue) {
-    this.insertNode(nodeValue, this.count)
+    this.insertAfterNode(nodeValue, this.tail)
   }
 
   // Pop removes the element at back
@@ -27,7 +27,7 @@ export class LinkedList {
 
   // unshift inserts a new value at front
   unshift(nodeValue) {
-    this.insertNode(nodeValue, 1)
+    this.insertAfterNode(nodeValue, null)
   }
 
   // delete the first occurrence of a specified value
@@ -76,29 +76,24 @@ export class LinkedList {
     }
   }
 
-  // insertNode adds a node insert the linked list
-  insertNode(nodeValue, index) {
+  // insertNode insert a node after a node called node
+  insertAfterNode(nodeValue, node) {
     const newNode = new Node(nodeValue)
     if (!this.head) {
       this.head = newNode
       this.tail = newNode
-    } else if (index == 1) {
+    } else if (node === null) {
       this.head.prev = newNode
       newNode.next = this.head
       this.head = newNode
-    } else if (index == this.count) {
+    } else if (node === this.tail) {
       newNode.prev = this.tail
       this.tail.next = newNode
       this.tail = newNode
     } else {
-      let currNode = this.head
-      let incr = 1
-      while (currNode.next !== null && incr < index) {
-        currNode = currNode.next
-        incr++
-      }
-      newNode.next = currNode.next
-      currNode.next = newNode
+      node.next.prev = newNode
+      node.next = newNode
+      newNode.prev = node
     }
   }
 }
