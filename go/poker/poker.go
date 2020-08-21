@@ -2,334 +2,204 @@ package poker
 
 import (
 	"errors"
-	"reflect"
 	"sort"
 	"strings"
 )
 
 var (
-	CardNumbers = map[string]int{"2": 2, "3": 3, "4": 4,
+	ErrInvalidHand = errors.New("Error, invalid cards dealt")
+	CardRank       = map[string]int{"2": 2, "3": 3, "4": 4,
 		"5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10,
 		"J": 11, "Q": 12, "K": 13, "A": 14}
-	CardSuit       = []string{"♢", "♡", "♧", "♤"}
-	ErrInvalidHand = errors.New("Error, invalid cards dealt")
 )
 
-type ranking int
+type Card struct {
+	rank int
+	suit string
+}
+
+type Hand struct {
+	rank  int
+	cards []Card
+}
 
 const (
-	FiveOfAKind ranking = iota + 1
-	StraightFlush
-	FourOfAKind
-	FullHouse
-	Flush
-	Straight
-	ThreeOfAKind
-	TwoPair
+	Heart   = '♡'
+	Diamond = '♢'
+	Spade   = '♧'
+	Club    = '♤'
+)
+const (
+	HighHand = iota + 1
 	OnePair
-	HighHand
+	TwoPair
+	ThreeOfAKind
+	Straight
+	Flush
+	FullHouse
+	FourOfAKind
+	StraightFlush
 )
 
-// rankedHand is a struct that includes the original cards, the faces and its ranking
-type rankedHand struct {
-	hand    string
-	numbers []int
-	rank    ranking
-}
-
 func BestHand(hands []string) ([]string, error) {
-	var result []string
-	var rankedHands []rankedHand
-
+	var results []string
+	var bestHand Hand
 	for _, hand := range hands {
-		rankedHand, err := DetermineHandRanking(hand)
+		h, err := parseHand(hand)
 		if err != nil {
-			return result, err
-		} else {
-			rankedHands = append(rankedHands, rankedHand)
+			return results, err
 		}
-	}
-
-	highestRank := rankedHands[0].rank
-	for _, v := range rankedHands {
-		if v.rank < highestRank {
-			highestRank = v.rank
+		if h.IsBetterHand(bestHand) {
+			bestHand, results = h, []string{hand}
+			continue
 		}
-	}
-
-	var highestRankedHands []rankedHand
-	for _, v := range rankedHands {
-		if v.rank == highestRank {
-			highestRankedHands = append(highestRankedHands, v)
+		if bestHand.IsBetterHand(h) {
+			continue
 		}
+		results = append(results, hand)
 	}
-
-	if len(highestRankedHands) > 1 {
-		// Process full house
-		if highestRankedHands[0].rank == FullHouse {
-			var highestTriplet int
-			var highestPair int
-			for _, hand := range highestRankedHands {
-				numFrequencyMap := NewCardFrequencyMap(hand.numbers, 2)
-				for k, v := range numFrequencyMap {
-					if v == 3 && k > highestTriplet {
-						highestTriplet = k
-					} else if v == 2 && k > highestPair {
-						highestPair = k
-					}
-				}
-			}
-
-			var deleteFullHouseIndices []int
-			for index, hand := range highestRankedHands {
-				numFrequencyMap := NewCardFrequencyMap(hand.numbers, 2)
-				for k, v := range numFrequencyMap {
-					if v == 3 && k < highestTriplet {
-						deleteFullHouseIndices = append(deleteFullHouseIndices, index)
-					}
-				}
-			}
-			highestRankedHands = DeleteLowerRankedCards(highestRankedHands, deleteFullHouseIndices)
-
-			if len(highestRankedHands) > 1 {
-				var deletePairIndices []int
-				for index, hand := range highestRankedHands {
-					numFrequencyMap := NewCardFrequencyMap(hand.numbers, 2)
-					for k, v := range numFrequencyMap {
-						if v == 2 && k < highestPair {
-							deletePairIndices = append(deletePairIndices, index)
-						}
-					}
-				}
-
-				highestRankedHands = DeleteLowerRankedCards(highestRankedHands, deletePairIndices)
-			}
-			for _, v := range highestRankedHands {
-				result = append(result, v.hand)
-			}
-			return result, nil
-		} else if highestRankedHands[0].rank == FourOfAKind {
-			var highestQuadruplet int
-			for _, hand := range highestRankedHands {
-				numFrequencyMap := NewCardFrequencyMap(hand.numbers, 2)
-				highestQuadruplet = HighestCard(numFrequencyMap, 4)
-			}
-
-			var deleteFourOfAKindIndices []int
-			for index, hand := range highestRankedHands {
-				numFrequencyMap := NewCardFrequencyMap(hand.numbers, 2)
-				for k, v := range numFrequencyMap {
-					if v == 4 && k < highestQuadruplet {
-						deleteFourOfAKindIndices = append(deleteFourOfAKindIndices, index)
-					}
-				}
-			}
-
-			highestRankedHands = DeleteLowerRankedCards(highestRankedHands, deleteFourOfAKindIndices)
-
-			if len(highestRankedHands) > 1 {
-				var highestKicker int
-				for _, hand := range highestRankedHands {
-					numFrequencyMap := NewCardFrequencyMap(hand.numbers, 2)
-					highestKicker = HighestCard(numFrequencyMap, 1) // kicker is a single card: freq=1
-				}
-				var deleteKickerIndices []int
-				for index, hand := range highestRankedHands {
-					numFrequencyMap := NewCardFrequencyMap(hand.numbers, 2)
-					for k, v := range numFrequencyMap {
-						if v == 1 && k < highestKicker {
-							deleteKickerIndices = append(deleteKickerIndices, index)
-						}
-					}
-				}
-				highestRankedHands = DeleteLowerRankedCards(highestRankedHands, deleteKickerIndices)
-			}
-
-			for _, v := range highestRankedHands {
-				result = append(result, v.hand)
-			}
-			return result, nil
-		}
-
-		for i := 0; i < 5; i++ {
-			if len(highestRankedHands) == 1 {
-				break
-			}
-			highestCardNum := highestRankedHands[0].numbers[i]
-			for j := 0; j < len(highestRankedHands); j++ {
-				if highestRankedHands[j].numbers[i] > highestCardNum {
-					highestCardNum = highestRankedHands[j].numbers[i]
-				}
-			}
-
-			var deleteIndices []int
-			for index, card := range highestRankedHands {
-				if card.numbers[i] != highestCardNum {
-					deleteIndices = append(deleteIndices, index)
-				}
-			}
-			highestRankedHands = DeleteLowerRankedCards(highestRankedHands, deleteIndices)
-		}
-	}
-
-	for _, v := range highestRankedHands {
-		result = append(result, v.hand)
-	}
-
-	return result, nil
+	return results, nil
 }
 
-// DetermineHandRanking parses and validate the cards and return the ranking and error
-func DetermineHandRanking(hand string) (rankedHand, error) {
-	parsedCards := strings.Split(hand, " ")
-	result := rankedHand{hand: hand}
-	if len(parsedCards) != 5 {
-		return result, ErrInvalidHand
-	}
-	var numbers []int
-	var suits []string
-
-	for _, cards := range parsedCards {
-		card := strings.Split(cards, "")
-		var number, suit string
-		if len(card) == 2 {
-			number, suit = card[0], card[1]
-		} else if len(card) == 3 {
-			number = card[0] + card[1]
-			suit = card[2]
-		} else {
-			return result, ErrInvalidHand
-		}
-
-		if _, ok := CardNumbers[number]; !ok {
-			return result, ErrInvalidHand
-		}
-		if !Contains(suit, CardSuit) {
-			return result, ErrInvalidHand
-		}
-
-		numbers = append(numbers, CardNumbers[number])
-		suits = append(suits, suit)
-	}
-	numbFrequencyMap := NewCardFrequencyMap(numbers, 5)
-
-	// get the values of the numbersMap
-	var cardFrequency []int
-	for _, v := range numbFrequencyMap {
-		cardFrequency = append(cardFrequency, v)
+func (h *Hand) IsBetterHand(otherHand Hand) bool {
+	if h.rank != otherHand.rank {
+		return h.rank > otherHand.rank
 	}
 
-	sort.Sort(sort.Reverse(sort.IntSlice(cardFrequency)))
-	sort.Sort(sort.Reverse(sort.IntSlice(numbers)))
-
-	isStraightFlag := IsStraight(numbers)
-	isFlushFlag := IsFlush(suits)
-	// if A exists in a low straight, then treat is as a lower card
-	if isStraightFlag && reflect.DeepEqual(numbers, []int{14, 5, 4, 3, 2}) {
-		numbers = append(numbers[:0], []int{5, 4, 3, 2, 1}...)
-	}
-
-	result.numbers = numbers
-
-	if isFlushFlag && isStraightFlag {
-		result.rank = StraightFlush
-		return result, nil
-	} else if isFlushFlag {
-		result.rank = Flush
-		return result, nil
-	} else if isStraightFlag {
-		result.rank = Straight
-		return result, nil
-	}
-
-	var threeOfAKind bool
-	var twoPairs int
-	for _, v := range cardFrequency {
-		if v == 4 {
-			result.rank = FourOfAKind
-			return result, nil
-		} else if v == 3 {
-			threeOfAKind = true
-		} else if v == 2 {
-			twoPairs++
+	if h.rank == StraightFlush {
+		if h.cards[0].rank == 2 && h.cards[4].rank == 14 {
+			return false
 		}
 	}
-	if threeOfAKind && twoPairs == 1 {
-		result.rank = FullHouse
-	} else if threeOfAKind {
-		result.rank = ThreeOfAKind
-	} else if twoPairs == 2 {
-		result.rank = TwoPair
-	} else if twoPairs == 1 {
-		result.rank = OnePair
-	} else {
-		result.rank = HighHand
-	}
-	return result, nil
-}
 
-// NewCardFrequencyMap returns the frequency of the card faces occurrence as a map
-func NewCardFrequencyMap(numbers []int, capacity int) map[int]int {
-	var numbFrequencyMap = make(map[int]int, capacity)
-	for _, v := range numbers {
-		if _, ok := numbFrequencyMap[v]; !ok {
-			numbFrequencyMap[v] = 1
-		} else {
-			numbFrequencyMap[v]++
-		}
-	}
-	return numbFrequencyMap
-}
-
-// DeleteLowerRankedCards deletes elements from the resulting slice as per indices
-func DeleteLowerRankedCards(hands []rankedHand, indices []int) []rankedHand {
-	for len(indices) > 0 {
-		hands = append(hands[:indices[0]], hands[indices[0]+1:]...)
-		indices = append(indices[:0], indices[1:]...)
-		for i := range indices {
-			indices[i]--
-		}
-	}
-	return hands
-}
-
-// HighestCard finds the highest card given a card number (e.g. triplet, pair, single) in a freqency map
-func HighestCard(freqMap map[int]int, freq int) int {
-	var highestCardNum int
-	for k, v := range freqMap {
-		if v == freq && k > highestCardNum {
-			highestCardNum = k
-		}
-	}
-	return highestCardNum
-}
-
-// Contains return a bool if s exists in collection slice
-func Contains(s string, collection []string) bool {
-	for _, v := range collection {
-		if v == s {
-			return true
+	for i, v := range h.cards {
+		if v.rank != otherHand.cards[i].rank {
+			return v.rank > otherHand.cards[i].rank
 		}
 	}
 	return false
 }
 
-func IsStraight(hand []int) bool {
-	if hand[0] == 14 && hand[1] == 5 && hand[2] == 4 && hand[3] == 3 && hand[4] == 2 {
+func parseHand(hand string) (Hand, error) {
+	var parsedHand Hand
+	parsedCards := strings.Split(hand, " ")
+	if len(parsedCards) != 5 {
+		return parsedHand, ErrInvalidHand
+	}
+	for _, cardStr := range parsedCards {
+		processedCard, err := parseCard(cardStr)
+		if err != nil {
+			return parsedHand, err
+		}
+		parsedHand.cards = append(parsedHand.cards, processedCard)
+	}
+	parsedHand.determineRank()
+	return parsedHand, nil
+}
+
+func parseCard(cardStr string) (Card, error) {
+	var c Card
+	card := strings.Split(cardStr, "")
+	var rank string
+	if len(card) == 2 {
+		rank = card[0]
+		c.suit = card[1]
+	} else if len(card) == 3 {
+		rank = card[0] + card[1]
+		c.suit = card[2]
+	} else {
+		return c, ErrInvalidHand
+	}
+	if _, ok := CardRank[rank]; !ok {
+		return c, ErrInvalidHand
+	}
+	if c.suit != string(Heart) && c.suit != string(Diamond) &&
+		c.suit != string(Spade) && c.suit != string(Club) {
+		return c, ErrInvalidHand
+	}
+	c.rank = CardRank[rank]
+	return c, nil
+}
+
+func (h *Hand) determineRank() {
+	var rankFrequencyMap = make(map[int]int, 5)
+	for _, card := range h.cards {
+		if _, ok := rankFrequencyMap[card.rank]; !ok {
+			rankFrequencyMap[card.rank] = 1
+		} else {
+			rankFrequencyMap[card.rank]++
+		}
+	}
+
+	sort.Slice(h.cards, func(i, j int) bool {
+		if rankFrequencyMap[h.cards[i].rank] > rankFrequencyMap[h.cards[j].rank] {
+			return true
+		}
+		if rankFrequencyMap[h.cards[i].rank] == rankFrequencyMap[h.cards[j].rank] {
+			return h.cards[i].rank > h.cards[j].rank
+		}
+		return false
+	})
+
+	var isStraightFlag, isFlushFlag, threeOfAKindFlag bool
+	var twoPairs int
+	isStraightFlag = IsStraight(*h)
+	isFlushFlag = IsFlush(*h)
+
+	if isFlushFlag && isStraightFlag {
+		h.rank = StraightFlush
+		return
+	} else if isFlushFlag {
+		h.rank = Flush
+		return
+	} else if isStraightFlag {
+		h.rank = Straight
+		return
+	}
+
+	for _, v := range rankFrequencyMap {
+		if v == 4 {
+			h.rank = FourOfAKind
+			return
+		} else if v == 3 {
+			threeOfAKindFlag = true
+		} else if v == 2 {
+			twoPairs++
+		}
+	}
+
+	if threeOfAKindFlag && twoPairs == 1 {
+		h.rank = FullHouse
+	} else if threeOfAKindFlag {
+		h.rank = ThreeOfAKind
+	} else if twoPairs == 2 {
+		h.rank = TwoPair
+	} else if twoPairs == 1 {
+		h.rank = OnePair
+	} else {
+		h.rank = HighHand
+	}
+}
+
+func IsStraight(h Hand) bool {
+	if h.cards[0].rank == 14 && h.cards[1].rank == 5 &&
+		h.cards[2].rank == 4 && h.cards[3].rank == 3 &&
+		h.cards[4].rank == 2 {
+		h.cards[0].rank = 1
 		return true
 	}
 
-	for i := range hand {
-		if i != 0 && hand[i]+1 != hand[i-1] {
+	for i := 1; i < len(h.cards); i++ {
+		if h.cards[i-1].rank != h.cards[i].rank+1 {
 			return false
 		}
 	}
 	return true
 }
 
-func IsFlush(hand []string) bool {
-	for i := range hand {
-		if i != 0 && hand[i] != hand[i-1] {
+func IsFlush(h Hand) bool {
+	for i := range h.cards {
+		if i != 0 && h.cards[i].suit != h.cards[i-1].suit {
 			return false
 		}
 	}
