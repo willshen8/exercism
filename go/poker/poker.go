@@ -65,7 +65,6 @@ func (h *Hand) IsBetterHand(otherHand Hand) bool {
 	if h.rank != otherHand.rank {
 		return h.rank > otherHand.rank
 	}
-
 	if h.rank == StraightFlush {
 		if h.cards[0].rank == 2 && h.cards[4].rank == 14 {
 			return false
@@ -113,8 +112,10 @@ func parseCard(cardStr string) (Card, error) {
 	if _, ok := CardRank[rank]; !ok {
 		return c, ErrInvalidHand
 	}
-	if c.suit != string(Heart) && c.suit != string(Diamond) &&
-		c.suit != string(Spade) && c.suit != string(Club) {
+	switch c.suit {
+	case string(Heart), string(Diamond), string(Spade), string(Club):
+		break
+	default:
 		return c, ErrInvalidHand
 	}
 	c.rank = CardRank[rank]
@@ -182,6 +183,7 @@ func (h *Hand) determineRank() {
 }
 
 func IsStraight(h Hand) bool {
+	// special case where A is treated as a 1
 	if h.cards[0].rank == 14 && h.cards[1].rank == 5 &&
 		h.cards[2].rank == 4 && h.cards[3].rank == 3 &&
 		h.cards[4].rank == 2 {
