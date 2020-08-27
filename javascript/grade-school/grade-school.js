@@ -4,9 +4,7 @@ export class GradeSchool {
   }
 
   roster() {
-    const rosterCopy = JSON.parse(JSON.stringify(this.school))
-    const sortObject = obj => Object.keys(obj).sort().reduce((res, key) => (res[key] = obj[key], res), {})
-    return sortObject(rosterCopy)
+    return JSON.parse(JSON.stringify(this.school))
   }
 
   add(name, grade) {
@@ -15,6 +13,8 @@ export class GradeSchool {
     } else {
       this.school[grade] = [name]
     }
+    const sortObject = obj => Object.keys(obj).sort().reduce((res, key) => (res[key] = obj[key], res), {})
+    sortObject(this.school)
   }
 
   grade(gradeNumber) {
