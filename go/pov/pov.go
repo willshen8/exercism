@@ -63,12 +63,11 @@ func (g *Graph) ArcList() []string {
 
 // FindPathVertices recursively finds a list of vertices between two vertices: from and to
 // and stores the results in a map called path
-func (g *Graph) FindPathVertices(from, to string) (path []Arc) {
-	keys := make([]string, 0, len(g.arcs))
+func (g *Graph) FindPathBetweenTwoVertices(from, to string) (path []Arc) {
+	keys := make([]string, len(g.arcs))
 	for k := range g.arcs {
 		keys = append(keys, k)
 	}
-
 	var found string
 	if _, ok := g.arcs[to]; !ok {
 		return path
@@ -82,33 +81,30 @@ func (g *Graph) FindPathVertices(from, to string) (path []Arc) {
 			}
 		}
 	}
-
-	// if found != from {
-	// 	path = g.FindPathVertices(from, found)
-	// }
 	return path
 }
 
 // ChangeRoot make the newRoot the newRoot and changes all directed arcs as well
 func (g *Graph) ChangeRoot(oldRoot, newRoot string) *Graph {
-	// first find all the nodes start from oldRoot to newRoot
-	path := g.FindPathVertices(oldRoot, newRoot)
-	fmt.Println("Path:", path)
-	if verticesTo, ok := g.arcs[oldRoot]; ok {
-		for _, v := range verticesTo {
-			if v == newRoot {
-				g.AddArc(newRoot, oldRoot)
-				g.RemoveArc(oldRoot, newRoot)
+	fromNodes := make([]string, 0, len(g.arcs))
+	for k := range g.arcs {
+		fromNodes = append(fromNodes, k)
+	}
+	var arcsToBeChanged []Arc
+	currNode := newRoot
+	for currNode != oldRoot {
+		for _, fromNode := range fromNodes {
+			for _, toNode := range g.arcs[fromNode] {
+				if currNode == toNode {
+					arcsToBeChanged = append(arcsToBeChanged, Arc{fromNode, toNode})
+					currNode = fromNode
+				}
 			}
 		}
 	}
+	for _, arc := range arcsToBeChanged {
+		g.RemoveArc(arc.from, arc.to)
+		g.AddArc(arc.to, arc.from)
+	}
 	return g
 }
-
-// FindPathBetweenTwoVertices returns a list of all nodes between two vertices
-// func (g *Graph) FindPathBetweenTwoVertices(from, to string) []string {
-// 	var pathVertices []string
-// 	for k, _ := range g.arcs[{
-// 		pathVertices = append(pathVertices, k)
-// 	}
-// }
