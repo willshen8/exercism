@@ -61,29 +61,6 @@ func (g *Graph) ArcList() []string {
 	return arcList
 }
 
-// FindPathVertices recursively finds a list of vertices between two vertices: from and to
-// and stores the results in a map called path
-func (g *Graph) FindPathBetweenTwoVertices(from, to string) (path []Arc) {
-	keys := make([]string, len(g.arcs))
-	for k := range g.arcs {
-		keys = append(keys, k)
-	}
-	var found string
-	if _, ok := g.arcs[to]; !ok {
-		return path
-	}
-	for _, k := range keys {
-		for _, arc := range g.arcs[k] {
-			if arc == to {
-				path = append(path, Arc{k, to})
-				found = k
-				fmt.Println("Found=", found)
-			}
-		}
-	}
-	return path
-}
-
 // ChangeRoot make the newRoot the newRoot and changes all directed arcs as well
 func (g *Graph) ChangeRoot(oldRoot, newRoot string) *Graph {
 	fromNodes := make([]string, 0, len(g.arcs))
