@@ -1,6 +1,6 @@
 package dna
 
-import "errors"
+import "fmt"
 
 var (
 	adenine  = 'A'
@@ -26,16 +26,10 @@ func (d DNA) Counts() (Histogram, error) {
 	h := Histogram{adenine: 0, cytosine: 0, guanine: 0, thymine: 0}
 	for _, v := range d {
 		switch v {
-		case adenine:
-			h[adenine]++
-		case cytosine:
-			h[cytosine]++
-		case guanine:
-			h[guanine]++
-		case thymine:
-			h[thymine]++
+		case adenine, cytosine, guanine, thymine:
+			h[v]++
 		default:
-			return h, errors.New("Invalid DNA strand")
+			return h, fmt.Errorf("Invalid DNA strand: %v", v)
 		}
 
 	}
