@@ -17,9 +17,8 @@ export class GradeSchool {
   }
 
   grade(gradeNumber) {
-    const rosterCopy = JSON.parse(JSON.stringify(this.school))
-    if (rosterCopy[gradeNumber])
-      return rosterCopy[gradeNumber]
+    if (this.school[gradeNumber])
+      return JSON.parse(JSON.stringify(this.school[gradeNumber]))
     else
       return []
   }
