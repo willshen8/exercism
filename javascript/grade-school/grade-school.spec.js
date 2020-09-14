@@ -1,6 +1,4 @@
-import {
-  GradeSchool
-} from './grade-school';
+import { GradeSchool } from './grade-school';
 
 describe('School', () => {
   let school;
@@ -16,9 +14,7 @@ describe('School', () => {
   test('adding a student adds them to the roster for the given grade', () => {
     school.add('Aimee', 2);
 
-    const expectedDb = {
-      2: ['Aimee']
-    };
+    const expectedDb = { 2: ['Aimee'] };
     expect(school.roster()).toEqual(expectedDb);
   });
 
@@ -27,9 +23,7 @@ describe('School', () => {
     school.add('James', 2);
     school.add('Paul', 2);
 
-    const expectedDb = {
-      2: ['Blair', 'James', 'Paul']
-    };
+    const expectedDb = { 2: ['Blair', 'James', 'Paul'] };
     expect(school.roster()).toEqual(expectedDb);
   });
 
@@ -37,10 +31,7 @@ describe('School', () => {
     school.add('Chelsea', 3);
     school.add('Logan', 7);
 
-    const expectedDb = {
-      3: ['Chelsea'],
-      7: ['Logan']
-    };
+    const expectedDb = { 3: ['Chelsea'], 7: ['Logan'] };
     expect(school.roster()).toEqual(expectedDb);
   });
 
@@ -64,10 +55,9 @@ describe('School', () => {
     school.add('Kyle', 3);
 
     const expectedSortedStudents = {
-      6: ['Kareem'],
-      4: ['Jennifer', 'Christopher'],
       3: ['Kyle'],
-
+      4: ['Christopher', 'Jennifer'],
+      6: ['Kareem'],
     };
     expect(school.roster()).toEqual(expectedSortedStudents);
   });
@@ -76,18 +66,14 @@ describe('School', () => {
     school.add('Aimee', 2);
     const roster = school.roster();
     roster[2].push('Oops.');
-    const expectedDb = {
-      2: ['Aimee']
-    };
+    const expectedDb = { 2: ['Aimee'] };
     expect(school.roster()).toEqual(expectedDb);
   });
 
   test('roster cannot be modified outside of module using grade()', () => {
     school.add('Aimee', 2);
     school.grade(2).push('Oops.');
-    const expectedDb = {
-      2: ['Aimee']
-    };
+    const expectedDb = { 2: ['Aimee'] };
     expect(school.roster()).toEqual(expectedDb);
   });
 });
