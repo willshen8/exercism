@@ -18,7 +18,7 @@ export class GradeSchool {
 
   grade(gradeNumber) {
     if (this.school[gradeNumber])
-      return JSON.parse(JSON.stringify(this.school[gradeNumber]))
+      return [...this.school[gradeNumber]]
     else
       return []
   }
