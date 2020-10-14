@@ -10,65 +10,46 @@ export class List {
 
     // concatenate (given a series of lists, combine all items in all lists into one flattened list)
     concat(listArray) {
-        let newList = Object.assign({}, this)
-        for (let i = 0; listArray.values[i] !== undefined; i++) {
-            newList.values = [...newList.values, ...listArray.values[i].values]
-        }
-        return newList
+        return this.append(new List(listArray.foldl((acc, item) => [...acc, ...item.values], [])))
     }
 
     // given a predicate and a list, return the list of all items for which predicate(item) is True)
     filter(predicate) {
-        let newList = new List()
-        for (let i = 0; i < this.length(); i++) {
-            if (predicate(this.values[i]))
-                newList.values = [...newList.values, this.values[i]]
-        }
-        return newList
+        return new List(this.foldl((acc, element) => predicate(element) ? [...acc, element] : [...acc], []))
     }
 
     // given a function and a list, return the list of the results of applying function(item) on all items)
     map(func) {
-        let newList = new List()
-        for (let i = 0; i < this.length(); i++) {
-            newList.values = [...newList.values, func(this.values[i])]
-        }
-        return newList
+        return new List(this.foldl((acc, element) => [...acc, func(element)], []))
     }
 
     // length returns the size of the list
     length() {
-        let count = 0
-        for (let i = 0; this.values[i] !== undefined; i++) {
-            count++
-        }
-        return count
+        return this.foldl(length => ++length, 0)
     }
 
-    // foldl given a function, a list, and initial accumulator, 
-    // fold (reduce) each item into the accumulator from the left using function(accumulator, item))
+    // fold is a generic helper function that works the same as foldl that accepts array as input
+    fold(func, acc, arr) {
+        const [first, ...rest] = arr
+        if (first === undefined)
+            return acc
+        acc = func(acc, first)
+        return this.fold(func, acc, rest)
+    }
+
+    // foldl (reduce) each item into the accumulator from the left using function(accumulator, item))
     foldl(func, accumulator) {
-        for (let i = 0; i < this.length(); i++) {
-            accumulator = func(accumulator, this.values[i])
-        }
-        return accumulator
+        return this.fold(func, accumulator, this.values)
     }
 
     // foldr (given a function, a list, and an initial accumulator, 
     // fold (reduce) each item into the accumulator from the right using function(item, accumulator))
     foldr(func, accumulator) {
-        for (let i = this.length() - 1; i >= 0; i--) {
-            accumulator = func(accumulator, this.values[i])
-        }
-        return accumulator
+        return this.reverse().foldl(func, accumulator)
     }
 
     // reverse (given a list, return a list with all the original items, but in reversed order)
     reverse() {
-        let newList = new List()
-        for (let i = this.length() - 1; i >= 0; i--) {
-            newList.values = [...newList.values, this.values[i]]
-        }
-        return newList
+        return new List(this.foldl((acc, element) => [element, ...acc], []))
     }
 }
