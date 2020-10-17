@@ -1,7 +1,8 @@
 const ASCII_A = 65
 const ASCII_Z = 90
-const NUMBERS = 10
-const TOTAL_NUMBER_OF_NAMES = 26 * 26 * 10 * 10 * 10;
+const DIGITS = 10
+const generateRandomLetter = () => String.fromCharCode(Math.floor(Math.random() * (ASCII_Z - ASCII_A) + ASCII_A))
+const generateRandomDigit = () => Math.floor(Math.random() * DIGITS)
 
 export class Robot {
     constructor() {
@@ -12,16 +13,17 @@ export class Robot {
     get name() { return this._name }
 
     generateRobotName = () => {
-        const alpha1 = String.fromCharCode(Math.floor(Math.random() * (ASCII_Z - ASCII_A) + ASCII_A))
-        const alpha2 = String.fromCharCode(Math.floor(Math.random() * (ASCII_Z - ASCII_A) + ASCII_A))
-        const num1 = Math.floor(Math.random() * NUMBERS)
-        const num2 = Math.floor(Math.random() * NUMBERS)
-        const num3 = Math.floor(Math.random() * NUMBERS)
-        if (this.usedNames.has(`${alpha1}${alpha2}${num1}${num2}${num3}`)) {
+        const alpha1 = generateRandomLetter()
+        const alpha2 = generateRandomLetter()
+        const num1 = generateRandomDigit()
+        const num2 = generateRandomDigit()
+        const num3 = generateRandomDigit()
+        const newRobotName = `${alpha1}${alpha2}${num1}${num2}${num3}`
+        if (this.usedNames.has(newRobotName)) {
             return this.generateRobotName()
         }
-        this.usedNames.add(`${alpha1}${alpha2}${num1}${num2}${num3}`)
-        return alpha1 + alpha2 + num1 + num2 + num3
+        this.usedNames.add(newRobotName)
+        return newRobotName
     }
 
     reset = () => this._name = this.generateRobotName()
