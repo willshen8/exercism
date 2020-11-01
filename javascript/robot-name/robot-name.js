@@ -1,32 +1,35 @@
+import { stringify } from "querystring"
+
 const ASCII_A = 65
 const ASCII_Z = 90
-const DIGITS = 10
+const MAX_NUM = 1000
 const generateRandomLetter = () => String.fromCharCode(Math.floor(Math.random() * (ASCII_Z - ASCII_A) + ASCII_A))
-const generateRandomDigit = () => Math.floor(Math.random() * DIGITS)
+const generateRandomNumber = () => Math.floor(Math.random() * MAX_NUM)
+const usedNames = new Set()
 
 export class Robot {
     constructor() {
-        this.usedNames = new Set()
-        this._name = this.generateRobotName()
+        this._name = this.generateUniqueRobotName()
     }
 
     get name() { return this._name }
 
-    generateRobotName = () => {
-        const alpha1 = generateRandomLetter()
-        const alpha2 = generateRandomLetter()
-        const num1 = generateRandomDigit()
-        const num2 = generateRandomDigit()
-        const num3 = generateRandomDigit()
-        const newRobotName = `${alpha1}${alpha2}${num1}${num2}${num3}`
-        if (this.usedNames.has(newRobotName)) {
-            return this.generateRobotName()
+    generateUniqueRobotName = () => {
+        let newRobotName = this.NewRobotName()
+        while (usedNames.has(newRobotName)) {
+            newRobotName = this.NewRobotName()
         }
-        this.usedNames.add(newRobotName)
+        usedNames.add(newRobotName)
         return newRobotName
     }
 
-    reset = () => this._name = this.generateRobotName()
-}
+    NewRobotName = () => {
+        const randomLetter1 = generateRandomLetter()
+        const randomLetter2 = generateRandomLetter()
+        const randomNum = generateRandomNumber().toString().padStart(3, "0")
+        return `${randomLetter1}${randomLetter2}${randomNum}`
+    }
 
+    reset = () => this._name = this.generateUniqueRobotName()
+}
 Robot.releaseNames = () => {};
