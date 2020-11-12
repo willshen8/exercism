@@ -1,22 +1,32 @@
-//
-// This is only a SKELETON file for the 'Simple Cipher' exercise. It's been provided as a
-// convenience to get you started writing code faster.
-//
+const ASCII_a = 97
+const ASCII_z = 122
+const MIN_NUM = 100
+const generateRandomLetter = () => String.fromCharCode(Math.floor(Math.random() * (ASCII_z - ASCII_a) + ASCII_a))
 
 export class Cipher {
-  constructor() {
-    throw new Error("Remove this statement and implement this function");
+  constructor(key) {
+    if (!key || key == undefined) {
+      for (let i=0; i<MIN_NUM; i++) {
+        this._key += generateRandomLetter()
+      }
+      return
+    }
+    this._key = key
   }
 
-  encode() {
-    throw new Error("Remove this statement and implement this function");
+  encode(input) {
+    return input.split("").map((char, index) => String.fromCharCode(char.charCodeAt(0) - ASCII_a + this._key[index].charCodeAt(0))).join('')
   }
 
-  decode() {
-    throw new Error("Remove this statement and implement this function");
+  decode(encodedMessage) {
+    return encodedMessage.split('').map((char, index) => String.fromCharCode(char.charCodeAt(0) - this._key[index].charCodeAt(0) + ASCII_a)).join('')
+  }
+
+  generateRandomLetter() {
+
   }
 
   get key() {
-    throw new Error("Remove this statement and implement this function");
+    return this._key
   }
 }
