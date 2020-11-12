@@ -11,18 +11,18 @@ describe('Random key cipher', () => {
     expect(cipher.encode('aaaaaaaaaa')).toEqual(cipher.key.substr(0, 10));
   });
 
-  xtest('can decode', () => {
+  test('can decode', () => {
     expect(cipher.decode(cipher.key.substr(0, 10))).toEqual('aaaaaaaaaa');
   });
 
-  xtest('is reversible', () => {
+  test('is reversible', () => {
     // I.e., if you apply decode in a encoded result, you must see
     // the same plaintext encode parameter as a result of the decode method
     const plaintext = 'abcdefghij';
     expect(cipher.decode(cipher.encode(plaintext))).toEqual(plaintext);
   });
 
-  xtest('key is made only of lowercase letters', () => {
+  test('key is made only of lowercase letters', () => {
     expect(cipher.key).toMatch(/^[a-z]+$/);
   });
 });
@@ -31,39 +31,39 @@ describe('Substitution cipher', () => {
   const key = 'abcdefghij';
   const cipher = new Cipher(key);
 
-  xtest('can encode', () => {
+  test('can encode', () => {
     expect(cipher.encode('aaaaaaaaaa')).toEqual('abcdefghij');
   });
 
-  xtest('can decode', () => {
+  test('can decode', () => {
     expect(cipher.decode('abcdefghij')).toEqual('aaaaaaaaaa');
   });
 
-  xtest('is reversible', () => {
+  test('is reversible', () => {
     // I.e., if you apply decode in a encoded result, you must see
     // the same plaintext encode parameter as a result of the decode method
     expect(cipher.decode(cipher.encode('abcdefghij'))).toEqual('abcdefghij');
   });
 
-  xtest('can double shift encode', () => {
+  test('can double shift encode', () => {
     expect(new Cipher('iamapandabear').encode('iamapandabear'))
       .toEqual('qayaeaagaciai');
   });
 
-  xtest('can wrap on encode', () => {
+  test('can wrap on encode', () => {
     expect(cipher.encode('zzzzzzzzzz')).toEqual('zabcdefghi');
   });
 
-  xtest('can wrap on decode', () => {
+  test('can wrap on decode', () => {
     expect(cipher.decode('zabcdefghi')).toEqual('zzzzzzzzzz');
   });
 
-  xtest('can encode messages longer than the key', () => {
+  test('can encode messages longer than the key', () => {
     expect(new Cipher('abc').encode('iamapandabear'))
       .toEqual('iboaqcnecbfcr');
   });
 
-  xtest('can decode messages longer than the key', () => {
+  test('can decode messages longer than the key', () => {
     expect(new Cipher('abc').decode('iboaqcnecbfcr'))
       .toEqual('iamapandabear');
   });
