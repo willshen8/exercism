@@ -1,8 +1,8 @@
-const ASCII_a = 97
-const ASCII_z = 122
+const FIRST_ALPHABET_CODE = 97
+const LAST_ALPHABET_CODE = 122
 const KEY_LENGTH = 100
 const NUM_OF_ENG_ALPHABET = 26
-const generateRandomLetter = () => String.fromCharCode(Math.floor(Math.random() * (ASCII_z - ASCII_a) + ASCII_a))
+const generateRandomLetter = () => String.fromCharCode(Math.floor(Math.random() * (LAST_ALPHABET_CODE - FIRST_ALPHABET_CODE) + FIRST_ALPHABET_CODE))
 
 export class Cipher {
   constructor(key) {
@@ -17,19 +17,21 @@ export class Cipher {
 
   encode(input) {
     return input.split("").map((char, index) => {
-      if (char.charCodeAt(0) + this._key[index % this._key.length].charCodeAt(0) - ASCII_a > ASCII_z) {
-        return String.fromCharCode(char.charCodeAt(0) + this._key[index % this._key.length].charCodeAt(0) - ASCII_a - NUM_OF_ENG_ALPHABET)
+      const finalPosition = char.charCodeAt(0) + this._key[index % this._key.length].charCodeAt(0) - FIRST_ALPHABET_CODE
+      if (finalPosition > LAST_ALPHABET_CODE) { // wrap if go beyond Z
+        return String.fromCharCode(finalPosition - NUM_OF_ENG_ALPHABET)
       }
-      return String.fromCharCode(char.charCodeAt(0) - ASCII_a + this._key[index % this._key.length].charCodeAt(0))
+      return String.fromCharCode(finalPosition)
     }).join('')
   }
 
   decode(encodedMessage) {
     return encodedMessage.split('').map((char, index) => {
-      if (char.charCodeAt(0) - this._key[index % this._key.length].charCodeAt(0) + ASCII_a < ASCII_a) {
-        return String.fromCharCode(char.charCodeAt(0) - this._key[index % this._key.length].charCodeAt(0) + ASCII_a + NUM_OF_ENG_ALPHABET)
+      const finalPosition = char.charCodeAt(0) - this._key[index % this._key.length].charCodeAt(0) + FIRST_ALPHABET_CODE 
+      if (finalPosition < FIRST_ALPHABET_CODE) { // wrap if go beyond A
+        return String.fromCharCode(finalPosition + NUM_OF_ENG_ALPHABET)
       }
-      return String.fromCharCode(char.charCodeAt(0) - this._key[index % this._key.length].charCodeAt(0) + ASCII_a)
+      return String.fromCharCode(finalPosition)
     }).join('')
   }
 
