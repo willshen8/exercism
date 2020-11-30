@@ -26,16 +26,19 @@ export class Cipher {
   }
 
   shift(input, direction) {
-    return input.split("").map((char, index) => {
-      const finalPosition = (direction === RIGHT) ? char.charCodeAt(0) + this._key[index % this._key.length].charCodeAt(0) - FIRST_ALPHABET_CODE
-        : char.charCodeAt(0) - this._key[index % this._key.length].charCodeAt(0) + FIRST_ALPHABET_CODE
-      if (direction === RIGHT && finalPosition > LAST_ALPHABET_CODE) {
-          return String.fromCharCode(finalPosition - NUM_OF_ENG_ALPHABET)
-      } else if (finalPosition < FIRST_ALPHABET_CODE) { // left
-          return String.fromCharCode(finalPosition + NUM_OF_ENG_ALPHABET)
-      }
-        return String.fromCharCode(finalPosition)
-    }).join('')
+    const rightShiftChar = (char, index) => char.charCodeAt(0) + this._key[index % this._key.length].charCodeAt(0) - FIRST_ALPHABET_CODE
+    const leftShiftChar = (char, index) => char.charCodeAt(0) - this._key[index % this._key.length].charCodeAt(0) + FIRST_ALPHABET_CODE
+    const shiftChar = (char, index) => {
+      const finalPosition = (direction === RIGHT) ? rightShiftChar(char, index) : leftShiftChar(char, index)
+        if (direction === RIGHT && finalPosition > LAST_ALPHABET_CODE) {
+            return String.fromCharCode(finalPosition - NUM_OF_ENG_ALPHABET)
+        }
+        if (finalPosition < FIRST_ALPHABET_CODE) { // left
+            return String.fromCharCode(finalPosition + NUM_OF_ENG_ALPHABET)
+        }
+      return String.fromCharCode(finalPosition)
+    }
+    return input.split("").map(shiftChar).join('')
   }
 
   get key() {
