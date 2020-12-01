@@ -1,10 +1,10 @@
-const FIRST_ALPHABET_CODE = 97
-const LAST_ALPHABET_CODE = 122
+const FIRST_ALPHABET_CODE = 'a'.charCodeAt(0)
+const LAST_ALPHABET_CODE = 'z'.charCodeAt(0)
 const KEY_LENGTH = 100
 const NUM_OF_ENG_ALPHABET = 26
 const RIGHT = 1
 const LEFT = 0
-const generateRandomLetter = () => String.fromCharCode(Math.floor(Math.random() * (LAST_ALPHABET_CODE - FIRST_ALPHABET_CODE) + FIRST_ALPHABET_CODE))
+const generateRandomLetter = () => String.fromCharCode(Math.floor(Math.random() * (LAST_ALPHABET_CODE - FIRST_ALPHABET_CODE + 1) + FIRST_ALPHABET_CODE))
 
 export class Cipher {
   constructor(key) {
@@ -26,16 +26,11 @@ export class Cipher {
   }
 
   shift(input, direction) {
-    const rightShiftChar = (char, index) => char.charCodeAt(0) + this._key[index % this._key.length].charCodeAt(0) - FIRST_ALPHABET_CODE
-    const leftShiftChar = (char, index) => char.charCodeAt(0) - this._key[index % this._key.length].charCodeAt(0) + FIRST_ALPHABET_CODE
     const shiftChar = (char, index) => {
-      const finalPosition = (direction === RIGHT) ? rightShiftChar(char, index) : leftShiftChar(char, index)
-        if (direction === RIGHT && finalPosition > LAST_ALPHABET_CODE) {
-            return String.fromCharCode(finalPosition - NUM_OF_ENG_ALPHABET)
-        }
-        if (finalPosition < FIRST_ALPHABET_CODE) { // left
-            return String.fromCharCode(finalPosition + NUM_OF_ENG_ALPHABET)
-        }
+      const charIndex = char.charCodeAt(0) - FIRST_ALPHABET_CODE
+      const shiftAmount = this._key[index % this._key.length].charCodeAt(0) - FIRST_ALPHABET_CODE
+      const shiftedTo = (direction === RIGHT) ? charIndex + shiftAmount : charIndex - shiftAmount
+      const finalPosition = (shiftedTo + NUM_OF_ENG_ALPHABET) % NUM_OF_ENG_ALPHABET + FIRST_ALPHABET_CODE
       return String.fromCharCode(finalPosition)
     }
     return input.split("").map(shiftChar).join('')
