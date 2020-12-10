@@ -19,19 +19,22 @@ export const answer = question => {
     }
   }
 
-  const parsedCommands = []
   const parsedQuestion = question.replace('?', '').split(" ")
-  parsedQuestion.map((word, index) => {
+  const filterWordsReducer = (filteredCommands, word, index) => {
     if (index === 0 && word !== "What") {
       throw new Error('Unknown operation')
     }
     if(isOperand(word) || isOperator(word)) {
-      parsedCommands.push(word)
+      filteredCommands.push(word)
     }
-  })
-  if (parsedCommands.length === 1 && parsedQuestion.length>3) throw new Error('Unknown operation')
+    return filteredCommands
+  }
+  const parsedCommands = parsedQuestion.reduce(filterWordsReducer, [])
+
+  if (parsedCommands.length === 1 && parsedQuestion.length > 3) throw new Error('Unknown operation')
   if (parsedCommands.length === 1 && isOperand(parsedCommands[0])) return parseInt(parsedCommands[0])
   let result = calculate(parseInt(parsedCommands[0]), parsedCommands[1], parseInt(parsedCommands[2]))
+ 
   for (let i=3; i<parsedCommands.length; i+=2){
     result = calculate(result, parsedCommands[i], parseInt(parsedCommands[i+1]))
   }
