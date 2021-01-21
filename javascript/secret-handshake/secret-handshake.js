@@ -1,8 +1,12 @@
-//
-// This is only a SKELETON file for the 'Secret Handshake' exercise. It's been provided as a
-// convenience to get you started writing code faster.
-//
+export const commands = secret => {
+  const secretHandshake = ['wink', 'double blink', 'close your eyes', 'jump']
+  const convertToBinaryString = num => (num).toString(2)
+  const reverseBitPosition = 4
 
-export const commands = () => {
-  throw new Error('Remove this statement and implement this function');
-};
+  let result = []
+  convertToBinaryString(secret).split("").reverse().map((digit, index) => {
+    if (digit === '1' && secretHandshake[index]) result.push(secretHandshake[index])
+    if (digit === '1' && index === reverseBitPosition) result.reverse()
+  })
+  return result
+}
