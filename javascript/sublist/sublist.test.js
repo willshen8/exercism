@@ -21,7 +21,7 @@ describe('Sublist', () => {
         const listA = new List([1]);
         const listB =  new List([2]);
         const result = listA.compare(listB);
-        expect(result).toEqual('NOT EQUAL')
+        expect(result).toEqual('UNEQUAL')
     })
 
     test('First list is a sub list of second list', () => {
@@ -62,8 +62,22 @@ describe('Sublist', () => {
 
     test('False start', () => {
         const listA = new List([1, 2, 3]);
-        const listB =  new List([1, 2, 1, 2, 3]);
+        const listB =  new List([1, 1, 2, 3]);
         const result = listA.compare(listB);
         expect(result).toEqual('SUBLIST')
+    })
+
+    test('Not Equal', () => {
+        const listA = new List([1, 2, 4]);
+        const listB =  new List([1, 2, 3, 4, 5]);
+        const result = listA.compare(listB);
+        expect(result).toEqual('UNEQUAL')
+    })
+
+    test('Not Equal', () => {
+        const listA = new List([1, 2, 3]);
+        const listB =  new List([1, 2, 3]);
+        const result = listA.compare(listB);
+        expect(result).toEqual('EQUAL')
     })
 })

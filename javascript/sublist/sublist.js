@@ -9,10 +9,16 @@ export class List {
     if (this._list === undefined && list.getList === undefined) {
       return 'EQUAL'
     }
+    if (this._list === undefined && list.getList.length > 0) {
+      return 'SUBLIST'
+    }
+    if (this._list.length > 0 && list.getList === undefined) {
+      return 'SUPERLIST'
+    }
 
     if(this._list.length === list.getList.length) {
       for (let i=0; i<this._list.length; i++){
-        if(this._list[i] !== list.getList[i]) return 'NOT EQUAL'
+        if(this._list[i] !== list.getList[i]) return 'UNEQUAL'
       }
       return 'EQUAL'
     }
@@ -22,6 +28,8 @@ export class List {
     } else if (this._list.length > list.getList.length && isSubArray(this._list, list.getList)) {
       return 'SUPERLIST'
     }
+
+    return 'UNEQUAL'
   }
 }
 
