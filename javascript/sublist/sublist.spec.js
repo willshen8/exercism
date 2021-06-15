@@ -1,7 +1,7 @@
 import { List } from './sublist';
 
 describe('sublist', () => {
-  test('two empty lists are equal', () => {
+  xtest('two empty lists are equal', () => {
     const listOne = new List();
     const listTwo = new List();
 
