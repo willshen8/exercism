@@ -1,5 +1,5 @@
 export class ResistorColor {
-  constructor(private colors: string[]) {
+  constructor(private colors: Color[]) {
     if (colors.length < 2) {
       throw new Error('At least two colors need to be present')
     }
@@ -23,4 +23,6 @@ const resistorColors = [
   'violet',
   'grey',
   'white',
-]
+] as const
+
+export type Color = typeof resistorColors[number]
