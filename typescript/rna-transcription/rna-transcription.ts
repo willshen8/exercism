@@ -4,6 +4,7 @@ const DNAtoRNA : { [key: string]: string } = {
   'T':'A',
   'A':'U',
 } as const
+
 class Transcriptor {
   toRna(dnaStrand:string): string {
     return dnaStrand.split('').map((item: string) => {
@@ -12,7 +13,5 @@ class Transcriptor {
     }).join("")
   }
 }
-
-
 
 export default Transcriptor
