@@ -45,6 +45,11 @@ describe('Pangram()', () => {
     expect(pangram.isPangram()).toBe(true)
   })
 
+  it('pangram with both upper and lower cases', () => {
+    const pangram = new Pangram('"Five quacking Zephyrs jolt my wax bed five times."')
+    expect(pangram.isPangram()).toBe(true)
+  })
+
   it('pangram with non-ascii characters', () => {
     const pangram = new Pangram(
       'Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich.'

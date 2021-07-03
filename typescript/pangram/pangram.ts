@@ -5,7 +5,7 @@ class Pangram {
     }
 
     isPangram():boolean {
-        const cleanedSentence = [...this.sentence.replace(/[^A-Za-z]/g, '')]
+        const cleanedSentence = [...this.sentence.toLowerCase().replace(/[^A-Za-z]/g, '')]
         const wordMap = new Map()
 
         cleanedSentence.forEach(letter => {
