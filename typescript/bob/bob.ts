@@ -11,8 +11,8 @@ class Bob {
 
   // List of situations
   const SITUATIONS:Array<any> = [{
-    answer: "Fine. Be that way!",
-    test: isSilence
+      answer: "Fine. Be that way!",
+      test: isSilence
     },
     {
       answer: "Calm down, I know what I'm doing!",
