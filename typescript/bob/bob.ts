@@ -5,12 +5,12 @@ const isAsking = (message: string) => message[message.length - 1] === '?'
 
 class Bob {
   hey(comment: string): string {
-    return SITUATIONS.find(situation => situation.test(comment.trim())).answer;
+    return SITUATIONS.find(situation => situation.test(comment.trim()))!.answer;
   }
 }
 
 // List of situations
-const SITUATIONS: Array<any> = [{
+const SITUATIONS: Array<{ answer: string, test: (s: string) => boolean }> = [{
   answer: "Fine. Be that way!",
   test: isSilence
 },
