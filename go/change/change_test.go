@@ -7,7 +7,8 @@ import (
 
 func TestChange(t *testing.T) {
 	for _, tc := range testCases {
-		actual, err := Change(tc.coins, tc.target)
+		cache := make(map[int][]int, tc.target)
+		actual, err := Change(tc.coins, tc.target, cache)
 		if tc.valid {
 			if err != nil {
 				t.Fatalf("%s : Change(%v, %d): expected %v, got error %s",
@@ -32,9 +33,10 @@ func TestChange(t *testing.T) {
 }
 
 func BenchmarkChange(b *testing.B) {
+	cache := make(map[int][]int)
 	for i := 0; i < b.N; i++ {
 		for _, tc := range testCases {
-			Change(tc.coins, tc.target)
+			Change(tc.coins, tc.target, cache)
 		}
 	}
 }

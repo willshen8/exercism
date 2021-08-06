@@ -5,7 +5,10 @@ import (
 	"sort"
 )
 
-func Change(coins []int, target int) ([]int, error) {
+func Change(coins []int, target int, resultsCache map[int][]int) ([]int, error) {
+	if val, ok := resultsCache[target]; ok {
+		return val, nil
+	}
 	if target == 0 {
 		return make([]int, 0), nil
 	}
@@ -16,7 +19,8 @@ func Change(coins []int, target int) ([]int, error) {
 	var leastNumOfCoinChangeCombinations []int
 	for _, coin := range coins {
 		remainder := target - coin
-		remainderCombination, _ := Change(coins, remainder)
+		remainderCombination, _ := Change(coins, remainder, resultsCache)
+
 		if remainderCombination != nil {
 			combination := append(remainderCombination, coin)
 			if leastNumOfCoinChangeCombinations == nil || len(combination) < len(leastNumOfCoinChangeCombinations) {
@@ -24,6 +28,10 @@ func Change(coins []int, target int) ([]int, error) {
 			}
 		}
 	}
+	if leastNumOfCoinChangeCombinations == nil {
+		return nil, errors.New("Can't find changes from coin combinations")
+	}
 	sort.Ints(leastNumOfCoinChangeCombinations)
+	resultsCache[target] = leastNumOfCoinChangeCombinations
 	return leastNumOfCoinChangeCombinations, nil
 }
