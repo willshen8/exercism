@@ -1,7 +1,7 @@
-export function keep<T>() {
-  throw new Error('Remove this statement and implement this function')
+export function keep<T>(inputList: T[], predicate: (item: T) => boolean): T[] {
+  return inputList.filter(listItem => predicate(listItem))
 }
 
-export function discard<T>() {
-  throw new Error('Remove this statement and implement this function')
+export function discard<T>(inputList: T[], predicate: (item: T) => boolean): T[] {
+  return inputList.filter(listItem => !predicate(listItem))
 }

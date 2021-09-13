@@ -5,21 +5,21 @@ describe('strain', () => {
     expect(keep<number>([], (e: number) => e < 10)).toEqual([])
   })
 
-  xit('keeps everything ', () => {
+  it('keeps everything ', () => {
     expect(keep<number>([1, 2, 3], (e: number) => e < 10)).toEqual([1, 2, 3])
   })
 
-  xit('keeps first and last', () => {
+  it('keeps first and last', () => {
     expect(keep<number>([1, 2, 3], (e: number) => e % 2 === 1)).toEqual([1, 3])
   })
 
-  xit('keeps neither first nor last', () => {
+  it('keeps neither first nor last', () => {
     expect(keep<number>([1, 2, 3, 4, 5], (e: number) => e % 2 === 0)).toEqual([
       2, 4,
     ])
   })
 
-  xit('keeps strings', () => {
+  it('keeps strings', () => {
     const words = 'apple zebra banana zombies cherimoya zelot'.split(' ')
     const result = keep<string>(
       words,
@@ -28,7 +28,7 @@ describe('strain', () => {
     expect(result).toEqual('zebra zombies zelot'.split(' '))
   })
 
-  xit('keeps arrays', () => {
+  it('keeps arrays', () => {
     const rows = [
       [1, 2, 3],
       [5, 5, 5],
@@ -47,7 +47,7 @@ describe('strain', () => {
     ])
   })
 
-  xit('empty discard', () => {
+  it('empty discard', () => {
     expect(discard<number>([], (e: number) => e < 10)).toEqual([])
   })
 
@@ -55,16 +55,16 @@ describe('strain', () => {
     expect(discard<number>([1, 2, 3], (e: number) => e > 10)).toEqual([1, 2, 3])
   })
 
-  xit('discards first and last', () => {
+  it('discards first and last', () => {
     expect(discard<number>([1, 2, 3], (e: number) => e % 2 === 1)).toEqual([2])
   })
 
-  xit('discards neither first nor last', () => {
+  it('discards neither first nor last', () => {
     const result = discard<number>([1, 2, 3, 4, 5], (e: number) => e % 2 === 0)
     expect(result).toEqual([1, 3, 5])
   })
 
-  xit('discards strings', () => {
+  it('discards strings', () => {
     const words = 'apple zebra banana zombies cherimoya zelot'.split(' ')
     const result = discard<string>(
       words,
@@ -73,7 +73,7 @@ describe('strain', () => {
     expect(result).toEqual('apple banana cherimoya'.split(' '))
   })
 
-  xit('discards arrays', () => {
+  it('discards arrays', () => {
     const rows = [
       [1, 2, 3],
       [5, 5, 5],
