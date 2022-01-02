@@ -11,5 +11,5 @@ export const score = (scrabbleScore: string | undefined): number => {
   }
 
   const reducer = (total: number, currentChar: string): number => total + (scoreMap.get(currentChar.toUpperCase()) || 0)
-  return scrabbleScore.split("").reduce(reducer, 0)
+  return [...scrabbleScore].reduce(reducer, 0)
 }
