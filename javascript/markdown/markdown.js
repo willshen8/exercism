@@ -1,8 +1,4 @@
-const wrap = (text, tag) => {
-  return `<${tag}>${text}</${tag}>`;
-};
-
-// removed unused function isTag
+const wrap = (text, tag) => `<${tag}>${text}</${tag}>`;
 
 const parser = (markdown, delimiter, tag) => {
   const pattern = new RegExp(`${delimiter}(.+)${delimiter}`);
@@ -10,23 +6,23 @@ const parser = (markdown, delimiter, tag) => {
   return markdown.replace(pattern, replacement);
 };
 
-const parseDoubleUnderscore = (markdown) => {
-  return parser(markdown, '__', 'strong');
+const delimitersWithTags = Object.freeze([
+  { delimiter: '__', tag: 'strong' },
+  { delimiter: '_', tag: 'em' },
+]);
+
+const parseText = (markdown) => {
+  delimitersWithTags.forEach((_, index) => {
+    const { delimiter, tag } = delimitersWithTags[index];
+    markdown = parser(markdown, delimiter, tag);
+  });
+
+  return markdown;
 };
 
-const parseSingleUnderscore = (markdown) => {
-  return parser(markdown, '_', 'em');
-};
+const parseParagraph = (markdown) => wrap(parseText(markdown), 'p');
 
-const parseText = (markdown, list) => {
-  const parsedText = parseSingleUnderscore(parseDoubleUnderscore(markdown));
-  if (!list) {
-    return wrap(parsedText, 'p');
-  }
-  return parsedText;
-};
-
-const parseHeader = (markdown, list) => {
+const parseHeader = (markdown) => {
   let headerLevels = 0;
 
   for (let i = 0; i < markdown.length; i++) {
@@ -37,58 +33,48 @@ const parseHeader = (markdown, list) => {
     }
   }
   if (headerLevels === 0 || headerLevels > 6) {
-    return [null, list];
+    return null;
   }
   const headerTag = `h${headerLevels}`;
-  const headerHtml = wrap(markdown.substring(headerLevels + 1), headerTag);
-  if (!list) {
-    return [headerHtml, false];
-  }
-  return [`</ul>${headerHtml}`, false];
+  return wrap(markdown.substring(headerLevels + 1), headerTag);
 };
 
-const parseLineItem = (markdown, list) => {
-  if (!markdown.startsWith('*')) return [null, list];
+const isListItem = (markdown) => markdown.startsWith('*');
 
+const parseLineItem = (markdown) => {
+  if (!isListItem(markdown)) return null;
   const innerHtml = wrap(parseText(markdown.substring(2), true), 'li');
-  if (list && markdown.startsWith('*')) {
-    return [innerHtml, true];
-  }
-  return [`<ul>${innerHtml}`, true];
+  return markdown.startsWith('*') ? innerHtml : `<ul>${innerHtml}`;
 };
 
-const parseParagraph = (markdown, list) => {
-  if (!list) {
-    return [parseText(markdown, false), false];
-  }
-  return [`</ul>${parseText(markdown, false)}`, false];
-};
-
-const parseLine = (markdown, list) => {
-  let [result, inListAfter] = parseHeader(markdown, list);
+const parseLine = (markdown) => {
+  let result = parseHeader(markdown);
   if (result === null) {
-    [result, inListAfter] = parseLineItem(markdown, list);
+    result = parseLineItem(markdown);
   }
   if (result === null) {
-    [result, inListAfter] = parseParagraph(markdown, list);
+    result = parseParagraph(markdown);
   }
-  if (result === null) {
-    throw new Error('Remove this line and implement the function');
-  }
-  return [result, inListAfter];
+  return result;
 };
 
 export const parse = (markdown) => {
   const lines = markdown.split('\n');
   let result = '';
   let isList = false;
+  let isFirstListItem = true;
   for (let i = 0; i < lines.length; i++) {
-    let [lineResult, newList] = parseLine(lines[i], isList);
+    isList = isListItem(lines[i]);
+    let lineResult = parseLine(lines[i]);
+    if (!isFirstListItem && !isList) {
+      lineResult = `</ul>${lineResult}`;
+    }
+    if (isList && isFirstListItem) {
+      lineResult = `<ul>${lineResult}`;
+      isFirstListItem = false;
+    }
     result += lineResult;
-    isList = newList;
   }
-  if (isList) {
-    return result + '</ul>';
-  }
-  return result;
+
+  return isList ? result + '</ul>' : result;
 };
