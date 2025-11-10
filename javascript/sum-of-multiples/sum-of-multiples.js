@@ -17,10 +17,4 @@ export const sum = (baseValues, levelCompleted) => {
   return sumOfSet(uniqueMultiplesSet);
 };
 
-const sumOfSet = (set) => {
-  let result = 0;
-  set.forEach((value) => {
-    result += value;
-  });
-  return result;
-};
+const sumOfSet = (set) => [...set].reduce((acc, curr) => acc + curr);
