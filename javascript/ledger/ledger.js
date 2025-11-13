@@ -47,23 +47,23 @@ const generateTableHeader = (locale) => {
 };
 
 const formatDateString = (locale, entry) => {
-  switch (locale) {
-    case 'en-US':
-      return `${(entry.date.getMonth() + 1)
-        .toString()
-        .padStart(2, '0')}/${entry.date
+  const formatters = {
+    'en-US': () =>
+      `${(entry.date.getMonth() + 1).toString().padStart(2, '0')}/${entry.date
         .getDate()
         .toString()
-        .padStart(2, '0')}/${entry.date.getFullYear()}`;
-    case 'nl-NL':
-      return `${entry.date.getDate().toString().padStart(2, '0')}-${(
+        .padStart(2, '0')}/${entry.date.getFullYear()}`,
+    'nl-NL': () =>
+      `${entry.date.getDate().toString().padStart(2, '0')}-${(
         entry.date.getMonth() + 1
       )
         .toString()
-        .padStart(2, '0')}-${entry.date.getFullYear()}`;
-    default:
-      throw new Error('Invalid locale, unable to format DateString');
-  }
+        .padStart(2, '0')}-${entry.date.getFullYear()}`,
+  };
+
+  // Provide default fallback
+  const formatter = formatters[locale] || formatters['en-US'];
+  return formatter(entry);
 };
 
 const truncateDescription = (entry) => {
@@ -78,19 +78,21 @@ const formatChangeString = (currency, locale, entry) => {
     locale,
     formattingOptions
   )} `;
-  switch (locale) {
-    case 'en-US':
+
+  const formatters = {
+    'en-US': () => {
       return entry.change < 0
         ? `(${Math.abs(entry.change / 100).toLocaleString(
             locale,
             formattingOptions
           )})`
         : changeStr;
-    case 'nl-NL':
-      return changeStr;
-    default:
-      throw new Error('Invalid locale, unable to process format Change');
-  }
+    },
+    'nl-NL': () => changeStr,
+  };
+
+  const formatter = formatters[locale] || formatters['en-US'];
+  return formatter(entry);
 };
 
 export const formatEntries = (currency, locale, entries) => {
